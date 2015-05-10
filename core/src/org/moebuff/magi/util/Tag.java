@@ -1,4 +1,4 @@
-package org.moebuff.magi.beatmap;
+package org.moebuff.magi.util;
 
 import java.lang.annotation.*;
 

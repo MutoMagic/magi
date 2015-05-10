@@ -2,17 +2,23 @@ package org.moebuff.magi.beatmap;
 
 import org.moebuff.magi.util.Reflect;
 import org.moebuff.magi.util.Stream;
+import org.moebuff.magi.util.Tag;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 谱面难度
  *
  * @author MuTo
  */
-public class Difficulty {
+public class Difficulty implements Reflect.TagResolver {
+    public static Reflect reflect = new Reflect(Difficulty.class);
+
     @Tag("[General]")//全局设置
     private String audioFilename;//歌曲文件名
     private String audioLeadIn;//歌曲开始延迟时间(0-3000)
@@ -68,17 +74,21 @@ public class Difficulty {
         try {
             reader = new BufferedReader(new FileReader(diff));
 
-            Reflect ref = new Reflect(this.getClass());
-            for (String line = ""; line != null; line = reader.readLine()) {
-                String[] split = line.split(":");
-                if (split.length == 2)
-                    ref.invokeSet(split[0].trim(), this, split[1].trim());
-            }
+            for (String line = ""; line != null; line = reader.readLine())
+                reflect.analyzeTag(this, line);
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
             Stream.close(reader);
         }
+    }
+
+    @Override
+    public Object analyze(Map<String, Set<Field>> tagFields, Reflect reflect, Object... args) {
+        String[] split = args[0].toString().split(":");
+        if (split.length == 2)
+            reflect.invokeSet(split[0].trim(), this, split[1].trim());
+        return null;
     }
 
     public String getAudioFilename() {
