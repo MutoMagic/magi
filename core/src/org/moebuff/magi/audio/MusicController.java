@@ -19,7 +19,6 @@ public class MusicController {
         music.setOnCompletionListener(new Music.OnCompletionListener() {
             @Override
             public void onCompletion(Music music) {
-
                 music.dispose();
             }
         });

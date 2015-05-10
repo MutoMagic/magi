@@ -48,11 +48,13 @@ public class PathUtil {
     }
 
     public static String addSeparator(String... args) {
+        return addSeparator(false, args);
+    }
+
+    public static String addSeparator(boolean last, String... args) {
         StringBuffer r = new StringBuffer();
-        for (int i = 0; i < args.length; i++) {
-            r.append(args[i]);
-            r.append(FILE_SEPARATOR);
-        }
-        return r.toString();
+        for (int i = 0; i < args.length; i++)
+            r.append(args[i]).append(FILE_SEPARATOR);
+        return last ? r.toString() : r.substring(0, r.length() - 1);
     }
 }

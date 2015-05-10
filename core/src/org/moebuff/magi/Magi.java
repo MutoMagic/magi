@@ -2,18 +2,12 @@ package org.moebuff.magi;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import org.moebuff.magi.beatmap.BeatMap;
+import org.moebuff.magi.audio.MusicController;
 import org.moebuff.magi.beatmap.MapLoader;
-import org.moebuff.magi.util.FileUtil;
-import org.moebuff.magi.util.PathUtil;
-
-import java.io.File;
 
 public class Magi extends ApplicationAdapter {
     SpriteBatch batch;//画笔
@@ -28,10 +22,8 @@ public class Magi extends ApplicationAdapter {
 
         MapLoader loader = new MapLoader();
         String musicName = loader.getBaetMaps().iterator().next().getMusicMap().values().iterator().next();
-
-        Music music = Gdx.audio.newMusic(Gdx.files.internal(musicName));
-        music.setLooping(true);
-        music.play();
+        System.out.println(musicName);
+        new MusicController(musicName).loopPlay();
     }
 
     @Override

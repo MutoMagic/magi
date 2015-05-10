@@ -70,7 +70,9 @@ public class Difficulty {
 
             Reflect ref = new Reflect(this.getClass());
             for (String line = ""; line != null; line = reader.readLine()) {
-
+                String[] split = line.split(":");
+                if (split.length == 2)
+                    ref.invokeSet(split[0].trim(), this, split[1].trim());
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

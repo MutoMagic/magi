@@ -13,7 +13,7 @@ import java.util.*;
  * @author MuTo
  */
 public class MapLoader {
-    public static final String SONGPATH = PathUtil.addSeparator(PathUtil.USERDIR, "songs");
+    public static final String SONGPATH = PathUtil.addSeparator(true, PathUtil.USERDIR, "songs");
     private Set<BeatMap> baetMaps = new HashSet();
 
     public MapLoader() {
