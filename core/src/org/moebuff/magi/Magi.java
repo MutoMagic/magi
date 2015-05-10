@@ -7,7 +7,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import org.moebuff.magi.audio.MusicController;
+import org.moebuff.magi.beatmap.BeatMap;
 import org.moebuff.magi.beatmap.MapLoader;
+
+import java.util.Iterator;
 
 public class Magi extends ApplicationAdapter {
     SpriteBatch batch;//画笔
@@ -21,7 +24,9 @@ public class Magi extends ApplicationAdapter {
         region = new TextureRegion(img, 0, 0, 160, 160);
 
         MapLoader loader = new MapLoader();
-        String musicName = loader.getBaetMaps().iterator().next().getMusicMap().values().iterator().next();
+        Iterator<BeatMap> bi = loader.getBaetMaps().iterator();
+        bi.next();//play heisei
+        String musicName = bi.next().getMusicMap().values().iterator().next();
         System.out.println(musicName);
         new MusicController(musicName).loopPlay();
     }
