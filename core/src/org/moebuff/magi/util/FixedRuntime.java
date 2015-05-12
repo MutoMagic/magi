@@ -2,8 +2,6 @@ package org.moebuff.magi.util;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * 运行时工具
@@ -12,17 +10,7 @@ import java.util.Date;
  */
 public class FixedRuntime {
     /**
-     * 当且仅当obj等于null时返回true。
-     *
-     * @param obj 需要判断的{@link Object}对象
-     * @return 当且仅当obj等于null时返回true。
-     */
-    public static boolean isNull(Object obj) {
-        return obj == null;
-    }
-
-    /**
-     * 判断obj数组及其元素是否等于null，这里用可变参数来代替{@link Object[]} 接收数据。
+     * 判断obj数组及其元素是否等于null。
      *
      * @param obj 需要判断的{@link Object} 数组
      * @return 如果obj数组等于null则返回true；否则判断数组中个每一个元素，当且仅当所有元素不等于null时返回false。
@@ -37,13 +25,23 @@ public class FixedRuntime {
     }
 
     /**
+     * 当obj等于null或obj数组长度为0时返回true。
+     *
+     * @param obj 需要判断的{@link Object} 数组
+     * @return 当obj等于null或obj数组长度为0时返回true。
+     */
+    public static boolean isEmpty(Object[] obj) {
+        return obj == null ? true : obj.length == 0;
+    }
+
+    /**
      * 判断arg0和arg1中的元素是否相同。
      *
      * @param arg0 需要判断的{@link Object}数组
      * @param arg1 需要判断的{@link Object}数组
      * @return 当且仅当arg0和arg1中的元素全部相同时返回true；否则返回false。
      */
-    public static boolean isSame(Object[] arg0, Object[] arg1) {
+    public static boolean same(Object[] arg0, Object[] arg1) {
         if (arg0.length != arg1.length)
             return false;
         for (int i = 0; i < arg0.length; i++)

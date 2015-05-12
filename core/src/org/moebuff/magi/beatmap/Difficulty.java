@@ -1,25 +1,17 @@
 package org.moebuff.magi.beatmap;
 
-import org.moebuff.magi.util.Reflect;
-import org.moebuff.magi.util.Stream;
-import org.moebuff.magi.util.Tag;
-
-import java.io.*;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * 谱面难度
  *
  * @author MuTo
  */
-public class Difficulty implements Reflect.TagResolver {
-    public static Reflect reflect = new Reflect(Difficulty.class);
+public class Difficulty extends ResolverKit<Difficulty> {
+    public static final Difficulty kit = new Difficulty();
 
-    @Tag("[General]")//全局设置
+    @Section("General")//全局设置
     private String audioFilename;//歌曲文件名
     private String audioLeadIn;//歌曲开始延迟时间(0-3000)
     private String previewTime;//浏览歌曲时间（黄线）：-1=从头开始播放歌曲
@@ -29,12 +21,12 @@ public class Difficulty implements Reflect.TagResolver {
     private String mode;//0=所有模式（OSU!），1=太鼓，2=CTB，3=mania
     private String letterboxInBreaks;//休息时显示聊天窗口
     private String widescreenStoryboard;//宽屏故事模式
-    @Tag("[Editor]")//编辑器设置
+    @Section("Editor")//编辑器设置
     private String bookmarks;//时间标签（蓝线）
     private String distanceSpacing;//默认物品间距
     private String batDivisor;//音符长短：倒数 {1,2,3,4,6,8,12,16}
     private String gridSize;//网格大小{1,2,4,8}
-    @Tag("[Metadata]")//歌曲信息
+    @Section("Metadata")//歌曲信息
     private String title;//标题
     private String titleUnicode;//Unicode标题
     private String artist;//作曲家
@@ -45,14 +37,14 @@ public class Difficulty implements Reflect.TagResolver {
     private String tags;//标签（搜索歌曲时用）
     private String beatmapID;//谱面编号(http://osu.ppy.sh/b/编号)
     private String beatmapSetID;//歌曲编号(http://osu.ppy.sh/s/编号)
-    @Tag("[Difficulty]")//难度信息
+    @Section("Difficulty")//难度信息
     private String HPDrainRate;//掉血速度(0-10)
     private String circleSize;//物品大小：数字越小则大(2-7)
     private String overallDifficulty;//总体难度：数字越大则击打判断区间越小(0-10)
     private String approachRate;//出现物品速度：数字越大则出现速度越快(0-10)
     private String sliderMultiplier;//滑条速度
     private String sliderTickRate;//每拍滑条小点个数
-    @Tag("[Events]")//事件
+    @Section(value = "Events", type = RESTYPE_LINE)//事件
     private String bgAndVideo;//背景图片和视频
     private String beakPeriods;//休息时间点
     //故事模式图层Storyboard Layer
@@ -62,34 +54,15 @@ public class Difficulty implements Reflect.TagResolver {
     private String sbLayer3;//Foreground
     private String sbSound;//故事模式声效层
     private String bgColor;//背景颜色
-    @Tag("[TimingPoints]")
+    @Section(value = "TimingPoints", type = RESTYPE_LINE)
     private List<String> timingPoints = new ArrayList();//timing点
-    @Tag("[Colours]")
+    @Section(value = "Colours", type = RESTYPE_LINE)
     private List<String> comboColours = new ArrayList();//combo颜色
-    @Tag("[HitObjects]")
+    @Section(value = "HitObjects", type = RESTYPE_LINE)
     private List<String> hitObjects = new ArrayList();//打击物件
 
-    public Difficulty(File diff) {
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new FileReader(diff));
-
-            for (String line = ""; line != null; line = reader.readLine())
-                reflect.analyzeTag(this, line);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            Stream.close(reader);
-        }
-    }
-
-    @Override
-    public Object analyze(Map<String, Set<Field>> tagFields, Reflect reflect, Object... args) {
-        String[] split = args[0].toString().split(":");
-        if (split.length == 2)
-            reflect.invokeSet(split[0].trim(), this, split[1].trim());
-        return null;
-    }
+    // Properties
+    // -------------------------------------------------------------------------
 
     public String getAudioFilename() {
         return audioFilename;

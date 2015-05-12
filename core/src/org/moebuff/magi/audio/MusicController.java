@@ -10,10 +10,6 @@ import com.badlogic.gdx.files.FileHandle;
  * @author MuTo
  */
 public class MusicController {
-    public interface OnCompletionListener {
-        void onCompletion(Music music);
-    }
-
     private FileHandle handle;
     private Music music;
     private OnCompletionListener onCompletionListener;
@@ -35,6 +31,9 @@ public class MusicController {
         music.setLooping(true);
         music.play();
     }
+
+    // Properties
+    // -------------------------------------------------------------------------
 
     public FileHandle getHandle() {
         return handle;
@@ -58,5 +57,12 @@ public class MusicController {
 
     public void setOnCompletionListener(OnCompletionListener onCompletionListener) {
         this.onCompletionListener = onCompletionListener;
+    }
+
+    // Internal
+    // -------------------------------------------------------------------------
+
+    public interface OnCompletionListener {
+        void onCompletion(Music music);
     }
 }

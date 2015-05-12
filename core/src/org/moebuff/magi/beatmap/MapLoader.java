@@ -21,6 +21,9 @@ public class MapLoader {
             baetMaps.add(new BeatMap(SONGPATH + path));
     }
 
+    // Properties
+    // -------------------------------------------------------------------------
+
     public Set<BeatMap> getBaetMaps() {
         return baetMaps;
     }

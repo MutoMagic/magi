@@ -34,11 +34,14 @@ public class BeatMap {
             }
         });
         for (File f : diffFiles) {
-            Difficulty diff = new Difficulty(f);
+            Difficulty diff = Difficulty.kit.read(f);
             diffs.add(diff);
             musicMap.put(diff, PathUtil.addSeparator(path, diff.getAudioFilename()));
         }
     }
+
+    // Properties
+    // -------------------------------------------------------------------------
 
     public String getPath() {
         return path;

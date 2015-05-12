@@ -40,6 +40,9 @@ public class XmlHelper {
         return root.elements(name);
     }
 
+    // Properties
+    // -------------------------------------------------------------------------
+
     public String getPath() {
         return path;
     }

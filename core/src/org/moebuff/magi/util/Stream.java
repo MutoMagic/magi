@@ -22,7 +22,6 @@ public class Stream {
      */
     public static ByteArrayOutputStream toOutputStream(InputStream in) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-
         byte[] b = new byte[1024];
         try {
             for (int i = 0; i != -1; i = in.read(b))
@@ -31,22 +30,16 @@ public class Stream {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         return out;
     }
 
     public static void close(Closeable c) {
         try {
-            if (!FixedRuntime.isNull(c))
+            if (c != null)
                 c.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static void close(Closeable... args) {
-        for (int i = 0; i < args.length; i++)
-            close(args[i]);
     }
 
     public Stream(InputStream in) {
@@ -58,7 +51,30 @@ public class Stream {
         return new ByteArrayInputStream(inTrans.toByteArray());
     }
 
+    // Properties
+    // -------------------------------------------------------------------------
+
+    public ByteArrayOutputStream getInTrans() {
+        return inTrans;
+    }
+
+    public void setInTrans(ByteArrayOutputStream inTrans) {
+        this.inTrans = inTrans;
+    }
+
+    public ByteArrayOutputStream getDecodeStream() {
+        return decodeStream;
+    }
+
+    public void setDecodeStream(ByteArrayOutputStream decodeStream) {
+        this.decodeStream = decodeStream;
+    }
+
     public String getEncoding() {
         return encoding;
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
     }
 }

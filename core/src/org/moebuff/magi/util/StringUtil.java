@@ -32,7 +32,7 @@ public class StringUtil {
      * @return 当且仅当s等于null或为null字符串时返回true。
      */
     public static boolean isNull(String s) {
-        return FixedRuntime.isNull(s) || s.equalsIgnoreCase(NULL_STRING);
+        return s == null || s.equalsIgnoreCase(NULL_STRING);
     }
 
     /**
@@ -42,16 +42,14 @@ public class StringUtil {
      * @return 当且仅当s等于null或 {@link String#isEmpty() s.isEmpty()} 为true时返回true。
      */
     public static boolean isEmpty(String s) {
-        return FixedRuntime.isNull(s) || s.isEmpty();
+        return s == null || s.isEmpty();
     }
 
     /**
-     * 当且仅当s为null或{@link String#isEmpty() s.isEmpty()} 为true时返回true。
-     * <p>与{@link #isEmpty(String)} 不同的是，该方法用{@link #isNull(String)}
-     * 替代原有的{@link FixedRuntime#isNull(Object)} 进行判断。
+     * 当且仅当{@link #isNull(String)} 为true或{@link String#isEmpty() s.isEmpty()} 为true时返回true。
      *
      * @param s 需要判断的字符串
-     * @return 当且仅当s为null或 {@link String#isEmpty() s.isEmpty()} 为true时返回true。
+     * @return 当且仅当{@link #isNull(String)} 为true或 {@link String#isEmpty() s.isEmpty()} 为true时返回true。
      */
     public static boolean isBlank(String s) {
         return isNull(s) || s.isEmpty();
@@ -79,19 +77,6 @@ public class StringUtil {
         if (FALSE_STRING.equals(s))
             return Boolean.FALSE;
         return null;
-    }
-
-    /**
-     * 返回of在s中第一次出现的位置索引，不区分大小写。
-     *
-     * @param s  被搜索的字符串
-     * @param of 需要搜索的子串
-     * @return of在s中第一次出现的位置索引，若s或of等于null，则返回{@code 1}。
-     */
-    public static int indexOf(String s, String of) {
-        if (FixedRuntime.isNull(s, of))
-            return -1;
-        return s.toUpperCase().indexOf(of.toUpperCase());
     }
 
     /**
@@ -181,9 +166,17 @@ public class StringUtil {
      * @return 拼接后的字符串
      */
     public static String toString(String[] args) {
+        return toString(args, "");
+    }
+
+    public static String toString(String[] args, String split) {
         StringBuffer str = new StringBuffer();
-        for (String s : args)
-            str.append(s);
+        for (int i = 0; ; ) {
+            str.append(args[i]);
+            if (++i == args.length)
+                break;
+            str.append(split);
+        }
         return str.toString();
     }
 
@@ -227,5 +220,9 @@ public class StringUtil {
 
     public static String delNotes(String s) {
         return s.replaceAll("//.*", "").replaceAll("/\\*.*\\*/", "");
+    }
+
+    public static String arrayStyle(String s, int index) {
+        return String.format("%s[%d]", s, index);
     }
 }

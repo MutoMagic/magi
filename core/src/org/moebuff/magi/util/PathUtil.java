@@ -44,17 +44,25 @@ public class PathUtil {
 
     public static String getPackagePath(Object obj) {
         Package p = obj.getClass().getPackage();
-        return FixedRuntime.isNull(p) ? null : p.getName().replaceAll("\\.", "/");
+        return p == null ? null : p.getName().replaceAll("\\.", "/");
     }
 
     public static String addSeparator(String... args) {
-        return addSeparator(false, args);
+        return FixedRuntime.isEmpty(args) ? addSeparator(true, args) : addSeparator(false, args);
     }
 
-    public static String addSeparator(boolean last, String... args) {
+    public static String addSeparator(boolean addLast, String... args) {
+        if (args == null)
+            return null;
+        if (args.length == 0)
+            return addLast ? FILE_SEPARATOR : "";
         StringBuffer r = new StringBuffer();
-        for (int i = 0; i < args.length; i++)
-            r.append(args[i]).append(FILE_SEPARATOR);
-        return last ? r.toString() : r.substring(0, r.length() - 1);
+        for (int i = 0; ; ) {
+            r.append(args[i]);
+            if (++i == args.length)
+                break;
+            r.append(FILE_SEPARATOR);
+        }
+        return addLast ? r.append(FILE_SEPARATOR).toString() : r.toString();
     }
 }
