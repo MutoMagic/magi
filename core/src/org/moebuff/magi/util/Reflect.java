@@ -34,25 +34,25 @@ public class Reflect {
         for (Method m : targetClass.getMethods()) {
             methods.add(m);
             String name = m.getName();
-            if (IS_PREFIX.indexOf(name) != -1)
+            if (name.indexOf(GET_PREFIX) == 0)
                 isMethods.add(m);
-            if (GET_PREFIX.indexOf(name) != -1)
+            if (name.indexOf(GET_PREFIX) == 0)
                 getMethods.add(m);
-            if (SET_PREFIX.indexOf(name) != -1)
+            if (name.indexOf(SET_PREFIX) == 0)
                 setMethods.add(m);
         }
     }
 
-    public Object invokeIs(String name, Object obj, Object... args) {
-        return invoke(IS_PREFIX + StringUtil.upperInitial(name), obj, args, isMethods.iterator());
+    public Object invokeIs(String name, Object obj) {
+        return invoke(IS_PREFIX + StringUtil.upperInitial(name), obj, null, isMethods.iterator());
     }
 
-    public Object invokeGet(String name, Object obj, Object... args) {
-        return invoke(GET_PREFIX + StringUtil.upperInitial(name), obj, args, getMethods.iterator());
+    public Object invokeGet(String name, Object obj) {
+        return invoke(GET_PREFIX + StringUtil.upperInitial(name), obj, null, getMethods.iterator());
     }
 
-    public Object invokeSet(String name, Object obj, Object... args) {
-        return invoke(SET_PREFIX + StringUtil.upperInitial(name), obj, args, setMethods.iterator());
+    public Object invokeSet(String name, Object obj, Object arg) {
+        return invoke(SET_PREFIX + StringUtil.upperInitial(name), obj, new Object[]{arg}, setMethods.iterator());
     }
 
     public Object invoke(String name, Object obj, Object... args) {

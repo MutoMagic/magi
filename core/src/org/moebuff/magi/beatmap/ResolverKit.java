@@ -1,6 +1,7 @@
 package org.moebuff.magi.beatmap;
 
 import org.moebuff.magi.util.PathUtil;
+import org.moebuff.magi.util.Reflect;
 import org.moebuff.magi.util.Stream;
 import org.moebuff.magi.util.StringUtil;
 
@@ -16,69 +17,75 @@ import java.util.*;
  *
  * @author MuTo
  */
-public abstract class ResolverKit<T> {
+public abstract class ResolverKit<T extends ResolverKit> {
     public static final int RESTYPE_ATTR = 0;
-    public static final int RESTYPE_LINE = RESTYPE_ATTR + 1;
+    public static final int RESTYPE_LINE = 1;
 
     private Class type = this.getClass();//当前对象类型
-    private Map<String, Section> sections = new HashMap();
-    private Map<String, List<Field>> sectionFields = new HashMap();
-    private List<Field> noSectionFields = new ArrayList();
-    private Map<String, String> attributes = new HashMap();
+    private Reflect reflect = new Reflect(type);//type的反射工具
+    //for copy
+    private Map<String, Section> sections;//<SectionName,Section>
+    private Map<String, Field> sectionFields;//<SectionName.FieldName,Field>
+    private Map<String, String> attributes;//<SectionName.属性名,属性值>
 
     public T read(String path) {
         return read(new File(path));
     }
 
-    public T read(File path) {
-        List<Field> fieldList = noSectionFields;
+    public T read(File f) {
+        try {
+            T t = (T) type.newInstance();
+            ResolverKit kit = t;
+            t.setSections(sections = new HashMap());
+            t.setSectionFields(sectionFields = new HashMap());
+            t.setAttributes(attributes = new HashMap());
+            sectionMap();
+            anaylze(f, t);//解析
+            return t;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void sectionMap() {
+        String sectionName = "";
         for (Field f : type.getDeclaredFields()) {
             Section sec = f.getAnnotation(Section.class);
             if (sec != null) {
+                sectionName = sec.value();
                 sections.put(sec.value(), sec);
-                sectionFields.put(sec.value(), fieldList = new ArrayList());
             }
-            fieldList.add(f);
+            sectionFields.put(StringUtil.cmdStyle(sectionName, f.getName()), f);
         }
+    }
 
-        //read file
+    private void anaylze(File f, T t) throws Exception {
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new FileReader(path));
-
-            int num = 1;//计数
+            int num = 1;
             Section sec = null;
-            for (String line = null, sectionName = null; (line = reader.readLine()) != null; ) {
+            String sectionName = "";
+            reader = new BufferedReader(new FileReader(f));
+            for (String line = null; (line = reader.readLine()) != null; ) {
                 if ((line = line.trim()).isEmpty())
                     continue;//排除空行
-
                 if (line.matches("^\\[.+\\]$")) {
                     sectionName = line.substring(num = 1, line.length() - 1);
                     sec = sections.get(sectionName);
                 } else if (sec != null && sec.type() == RESTYPE_ATTR) {
                     String[] split = line.split(":");
-                    if (split.length == 2)
-                        attributes.put(sectionName + split[0], split[1].trim());
+                    if (split.length == 2) {
+                        String name = split[0].trim();
+                        String value = split[1].trim();
+                        attributes.put(StringUtil.cmdStyle(sectionName, name), value);
+                        reflect.invokeSet(name, t, value);
+                    }
                 } else
                     attributes.put(StringUtil.arrayStyle(sectionName, num++), line);
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         } finally {
             Stream.close(reader);
         }
-
-        int nums = 0;
-        for (String s : attributes.keySet()) {
-            if (s.indexOf("HitObjects") != -1)
-                nums++;
-        }
-        for (int i = 1; i <= nums; i++) {
-            String s = StringUtil.arrayStyle("HitObjects", i);
-            System.out.println(s + "=" + attributes.get(s));
-        }
-
-        return null;
     }
 
     // Properties
@@ -92,6 +99,14 @@ public abstract class ResolverKit<T> {
         this.type = type;
     }
 
+    public Reflect getReflect() {
+        return reflect;
+    }
+
+    public void setReflect(Reflect reflect) {
+        this.reflect = reflect;
+    }
+
     public Map<String, Section> getSections() {
         return sections;
     }
@@ -100,20 +115,12 @@ public abstract class ResolverKit<T> {
         this.sections = sections;
     }
 
-    public Map<String, List<Field>> getSectionFields() {
+    public Map<String, Field> getSectionFields() {
         return sectionFields;
     }
 
-    public void setSectionFields(Map<String, List<Field>> sectionFields) {
+    public void setSectionFields(Map<String, Field> sectionFields) {
         this.sectionFields = sectionFields;
-    }
-
-    public List<Field> getNoSectionFields() {
-        return noSectionFields;
-    }
-
-    public void setNoSectionFields(List<Field> noSectionFields) {
-        this.noSectionFields = noSectionFields;
     }
 
     public Map<String, String> getAttributes() {
@@ -142,6 +149,7 @@ public abstract class ResolverKit<T> {
     }
 
     public static void main(String[] args) {
-        Difficulty.kit.read(PathUtil.addSeparator(PathUtil.USERDIR, "songs/72217 Zips - Heisei Cataclysm/Zips - Heisei Cataclysm (Dark Fang) [0108].osu"));
+        String n = Difficulty.kit.read(PathUtil.addSeparator(PathUtil.USERDIR, "songs/72217 Zips - Heisei Cataclysm/Zips - Heisei Cataclysm (Dark Fang) [0108].osu")).getAudioFilename();
+        System.out.println(n);
     }
 }

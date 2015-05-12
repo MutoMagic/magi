@@ -11,6 +11,7 @@ import java.util.List;
 public class Difficulty extends ResolverKit<Difficulty> {
     public static final Difficulty kit = new Difficulty();
 
+    private String fileFormat;
     @Section("General")//全局设置
     private String audioFilename;//歌曲文件名
     private String audioLeadIn;//歌曲开始延迟时间(0-3000)
@@ -63,6 +64,14 @@ public class Difficulty extends ResolverKit<Difficulty> {
 
     // Properties
     // -------------------------------------------------------------------------
+
+    public String getFileFormat() {
+        return fileFormat;
+    }
+
+    public void setFileFormat(String fileFormat) {
+        this.fileFormat = fileFormat;
+    }
 
     public String getAudioFilename() {
         return audioFilename;

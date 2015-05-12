@@ -225,4 +225,8 @@ public class StringUtil {
     public static String arrayStyle(String s, int index) {
         return String.format("%s[%d]", s, index);
     }
+
+    public static String cmdStyle(String obj, String attr) {
+        return String.format("%s.%s", obj, attr);
+    }
 }
