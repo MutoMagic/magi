@@ -20,6 +20,7 @@ import java.util.*;
 public abstract class ResolverKit<T extends ResolverKit> {
     public static final int RESTYPE_ATTR = 0;
     public static final int RESTYPE_LINE = 1;
+    public static final int RESTYPE_EXEC = 2;
 
     private Class type = this.getClass();//当前对象类型
     private Reflect reflect = new Reflect(type);//type的反射工具
@@ -35,19 +36,22 @@ public abstract class ResolverKit<T extends ResolverKit> {
     public T read(File f) {
         try {
             T t = (T) type.newInstance();
-            ResolverKit kit = t;
+
+            //copy attr
             t.setSections(sections = new HashMap());
             t.setSectionFields(sectionFields = new HashMap());
             t.setAttributes(attributes = new HashMap());
-            sectionMap();
-            anaylze(f, t);//解析
+
+            analyzeClass();
+            anaylzeFile(f, t);//解析文件
+
             return t;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void sectionMap() {
+    private void analyzeClass() {
         String sectionName = "";
         for (Field f : type.getDeclaredFields()) {
             Section sec = f.getAnnotation(Section.class);
@@ -59,7 +63,7 @@ public abstract class ResolverKit<T extends ResolverKit> {
         }
     }
 
-    private void anaylze(File f, T t) throws Exception {
+    private void anaylzeFile(File f, T t) throws Exception {
         BufferedReader reader = null;
         try {
             int num = 1;
@@ -80,8 +84,18 @@ public abstract class ResolverKit<T extends ResolverKit> {
                         attributes.put(StringUtil.cmdStyle(sectionName, name), value);
                         reflect.invokeSet(name, t, value);
                     }
-                } else
+                } else {
+                    if (sec != null && sec.type() == RESTYPE_LINE) {
+                        String fieldName = StringUtil.lowerInitial(sectionName);
+                        Field field = sectionFields.get(StringUtil.cmdStyle(sectionName, fieldName));
+                        field.setAccessible(true);
+                        List list = (List) field.get(t);
+                        list.add(line);
+                    } else if (sec != null && sec.type() == RESTYPE_EXEC)
+                        ;
                     attributes.put(StringUtil.arrayStyle(sectionName, num++), line);
+                }
+
             }
         } finally {
             Stream.close(reader);
@@ -146,10 +160,5 @@ public abstract class ResolverKit<T extends ResolverKit> {
         String value();
 
         int type() default RESTYPE_ATTR;
-    }
-
-    public static void main(String[] args) {
-        String n = Difficulty.kit.read(PathUtil.addSeparator(PathUtil.USERDIR, "songs/72217 Zips - Heisei Cataclysm/Zips - Heisei Cataclysm (Dark Fang) [0108].osu")).getAudioFilename();
-        System.out.println(n);
     }
 }

@@ -90,6 +90,16 @@ public class StringUtil {
     }
 
     /**
+     * 首字母小写
+     *
+     * @param s 需要小写首字母的字符串
+     * @return 首字母小写的字符串
+     */
+    public static String lowerInitial(String s) {
+        return s.substring(0, 1).toLowerCase() + s.substring(1);
+    }
+
+    /**
      * 将s强转成int，若转换失败则返回{@code -1}。
      * <p>该方法内部调用{@link #toInt(String, int)}，beginIndex默认为{@code 0}。
      *
@@ -226,7 +236,7 @@ public class StringUtil {
         return String.format("%s[%d]", s, index);
     }
 
-    public static String cmdStyle(String obj, String attr) {
-        return String.format("%s.%s", obj, attr);
+    public static String cmdStyle(String arg0, String arg1) {
+        return String.format("%s.%s", arg0, arg1);
     }
 }

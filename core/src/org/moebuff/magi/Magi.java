@@ -25,7 +25,6 @@ public class Magi extends ApplicationAdapter {
 
         MapLoader loader = new MapLoader();
         Iterator<BeatMap> bi = loader.getBaetMaps().iterator();
-        bi.next();//play heisei
         String musicName = bi.next().getMusicMap().values().iterator().next();
         System.out.println(musicName);
         new MusicController(musicName).loopPlay();
