@@ -22,8 +22,9 @@ import java.util.*;
  * 5.解析类型为RESTYPE_LINE时，需手动声明解析方法。方法名：analyze+SectionName
  * 6.继承后必须重写构造方法。
  * 注意：
- * 1.调用{@link #read(File)} 时，数据关联会跑两次，第一次为新对象赋值，第二次为刷新原有对象。
- * 2.创建新对象会初始化工具类，此过程重复执行会降低效率。若能重用请调用带参构造方法。
+ * 1.创建新对象会初始化工具类，此过程重复执行会降低效率。若能重用请调用带参构造方法。
+ * 2.不要尝试使用{@link #read(File)} 来更新原有数据，即使事后调用{@link #sync()}，
+ * 这样操作是不安全的，原有数据更新请执行{@link #reload()} 方法。
  *
  * @author MuTo
  */
@@ -36,6 +37,7 @@ public abstract class ResolverKit<T extends ResolverKit> {
     private Reflect<T> reflect;//type的反射工具
     private Map<String, Section> sections;//<SectionName,Section>
     private Map<String, List<Field>> sectionFields;//<SectionName,Fields>
+    private File document;//当前文件对象
     private Map<String, String> attributes;//<SectionName.属性名|SectionName[index],属性值|行>
 
     ResolverKit() {
@@ -67,19 +69,36 @@ public abstract class ResolverKit<T extends ResolverKit> {
         sectionFields = secfield;
     }
 
+    public T reload() {
+        attributes = new HashMap();
+        anaylzeFile(document);
+        sync();
+        return (T) this;
+    }
+
+    //更新原有数据，不推荐外部调用
+    @Deprecated
+    public void sync() {
+        for (Field f : type.getDeclaredFields())
+            if (f.getType() == List.class)
+                reflect.invokeSet(f.getName(), this, new ArrayList());
+        crossFile(this);
+    }
+
     public T read(String path) {
         return read(new File(path));
     }
 
     public T read(File f) {
         T t = reflect.newInstance(type, reflect, sections, sectionFields);
+        t.setDocument(document = f);
         t.setAttributes(attributes = new HashMap());
-        anaylzeFile(f);//解析文件
-        crossFile(t);//关联属性
-        sync();//更新原有数据
+        anaylzeFile(f);
+        crossFile(t);
         return t;
     }
 
+    //解析文件
     private void anaylzeFile(File f) {
         BufferedReader reader = null;
         try {
@@ -119,6 +138,7 @@ public abstract class ResolverKit<T extends ResolverKit> {
         }
     }
 
+    //关联属性
     private void crossFile(Object obj) {
         for (Iterator<String> secKeyI = sections.keySet().iterator(); secKeyI.hasNext(); ) {
             String sectionName = secKeyI.next();
@@ -146,13 +166,6 @@ public abstract class ResolverKit<T extends ResolverKit> {
                 }
             }
         }
-    }
-
-    private void sync() {
-        for (Field f : type.getDeclaredFields())
-            if (f.getType() == List.class)
-                reflect.invokeSet(f.getName(), this, new ArrayList());
-        crossFile(this);
     }
 
     // Properties
@@ -188,6 +201,14 @@ public abstract class ResolverKit<T extends ResolverKit> {
 
     public void setSectionFields(Map<String, List<Field>> sectionFields) {
         this.sectionFields = sectionFields;
+    }
+
+    public File getDocument() {
+        return document;
+    }
+
+    public void setDocument(File document) {
+        this.document = document;
     }
 
     public Map<String, String> getAttributes() {
