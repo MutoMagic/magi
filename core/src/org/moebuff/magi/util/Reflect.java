@@ -76,7 +76,7 @@ public class Reflect<T> {
     }
 
     public Object invoke(String name, Object obj, Object... args) {
-        return invoke(name, null, obj, args);
+        return invoke(name, getTypes(args), obj, args);
     }
 
     public Object invoke(String name, Object[] paramTypes, Object obj, Object... args) {
@@ -84,7 +84,7 @@ public class Reflect<T> {
     }
 
     private Object invoke(String name, Object obj, Object[] args, Iterator<Method> methods) {
-        return invoke(name, null, obj, args, methods);
+        return invoke(name, getTypes(args), obj, args, methods);
     }
 
     private Object invoke(String name, Object[] paramTypes, Object obj, Object[] args, Iterator<Method> methods) {
