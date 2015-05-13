@@ -69,8 +69,12 @@ public class Difficulty extends ResolverKit<Difficulty> {
     public Difficulty() {
     }
 
-    Difficulty(Class c, Reflect r, HashMap sec, HashMap secfield) {
+    public Difficulty(Class c, Reflect r, HashMap sec, HashMap secfield) {
         super(c, r, sec, secfield);
+    }
+
+    public void analyzeEvents() {
+        System.out.println(233);
     }
 
     // Properties

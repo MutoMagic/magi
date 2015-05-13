@@ -13,6 +13,17 @@ import java.util.*;
 
 /**
  * 类ini文件解析工具
+ * <p/>
+ * 约定：
+ * 1.属性必须是{@link String} 或{@link List}
+ * 2.String保存键值对的值，List保存行。
+ * 3.键值对的赋值符号为SYMBOL_ASSIGNMENT
+ * 4.解析类型默认为RESTYPE_ATTR
+ * 5.解析类型为RESTYPE_LINE时，需手动声明解析方法。方法名：analyze+SectionName
+ * 6.继承后必须重写构造方法。
+ * 注意：
+ * 1.调用{@link #read(File)} 时，数据关联会跑两次，第一次为新对象赋值，第二次为刷新原有对象。
+ * 2.创建新对象会初始化工具类，此过程重复执行会降低效率。若能重用请调用带参构造方法。
  *
  * @author MuTo
  */
@@ -114,7 +125,7 @@ public abstract class ResolverKit<T extends ResolverKit> {
             Section sec = sections.get(sectionName);
             List<Field> fieldList = sectionFields.get(sectionName);
             if (sec.type() == RESTYPE_LINE) {
-                //手动解析
+                reflect.invoke("analyze" + StringUtil.upperInitial(sectionName), obj);
             } else {
                 Field firstField = fieldList.get(0);
                 if (fieldList.size() == 1 && firstField.getType() == List.class) {
@@ -202,5 +213,9 @@ public abstract class ResolverKit<T extends ResolverKit> {
         String value();
 
         int type() default RESTYPE_ATTR;
+    }
+
+    public static void main(String[] args) {
+        Difficulty.kit.read(MapLoader.SONGPATH + "72217 Zips - Heisei Cataclysm/Zips - Heisei Cataclysm (Dark Fang) [0108].osu");
     }
 }
