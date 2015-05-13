@@ -1,7 +1,12 @@
 package org.moebuff.magi.beatmap;
 
+import org.moebuff.magi.util.Reflect;
+
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 谱面难度
@@ -11,7 +16,6 @@ import java.util.List;
 public class Difficulty extends ResolverKit<Difficulty> {
     public static final Difficulty kit = new Difficulty();
 
-    private String fileFormat;
     @Section("General")//全局设置
     private String audioFilename;//歌曲文件名
     private String audioLeadIn;//歌曲开始延迟时间(0-3000)
@@ -45,7 +49,7 @@ public class Difficulty extends ResolverKit<Difficulty> {
     private String approachRate;//出现物品速度：数字越大则出现速度越快(0-10)
     private String sliderMultiplier;//滑条速度
     private String sliderTickRate;//每拍滑条小点个数
-    @Section(value = "Events", type = RESTYPE_EXEC)//事件
+    @Section(value = "Events", type = RESTYPE_LINE)//事件
     private String bgAndVideo;//背景图片和视频
     private String beakPeriods;//休息时间点
     //故事模式图层Storyboard Layer
@@ -55,23 +59,22 @@ public class Difficulty extends ResolverKit<Difficulty> {
     private String sbLayer3;//Foreground
     private String sbSound;//故事模式声效层
     private String bgColor;//背景颜色
-    @Section(value = "TimingPoints", type = RESTYPE_LINE)
+    @Section("TimingPoints")
     private List<String> timingPoints = new ArrayList();//timing点
-    @Section(value = "Colours", type = RESTYPE_LINE)
-    private List<String> colours = new ArrayList();//combo颜色
-    @Section(value = "HitObjects", type = RESTYPE_LINE)
+    @Section("Colours")
+    private List<String> comboColours = new ArrayList();//combo颜色
+    @Section("HitObjects")
     private List<String> hitObjects = new ArrayList();//打击物件
+
+    public Difficulty() {
+    }
+
+    Difficulty(Class c, Reflect r, HashMap sec, HashMap secfield) {
+        super(c, r, sec, secfield);
+    }
 
     // Properties
     // -------------------------------------------------------------------------
-
-    public String getFileFormat() {
-        return fileFormat;
-    }
-
-    public void setFileFormat(String fileFormat) {
-        this.fileFormat = fileFormat;
-    }
 
     public String getAudioFilename() {
         return audioFilename;
@@ -377,12 +380,12 @@ public class Difficulty extends ResolverKit<Difficulty> {
         this.timingPoints = timingPoints;
     }
 
-    public List<String> getColours() {
-        return colours;
+    public List<String> getComboColours() {
+        return comboColours;
     }
 
-    public void setColours(List<String> colours) {
-        this.colours = colours;
+    public void setComboColours(List<String> comboColours) {
+        this.comboColours = comboColours;
     }
 
     public List<String> getHitObjects() {

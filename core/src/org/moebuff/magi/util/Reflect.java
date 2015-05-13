@@ -1,5 +1,6 @@
 package org.moebuff.magi.util;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -9,7 +10,7 @@ import java.util.*;
  *
  * @author MuTo
  */
-public class Reflect {
+public class Reflect<T> {
     public static final String IS_PREFIX = "is";
     public static final String GET_PREFIX = "get";
     public static final String SET_PREFIX = "set";
@@ -28,6 +29,15 @@ public class Reflect {
         }
     }
 
+    public static Class[] getTypes(Object... args) {
+        if (args == null)
+            return null;
+        Class[] classes = new Class[args.length];
+        for (int i = 0; i < args.length; i++)
+            classes[i] = args[i] == null ? null : args[i].getClass();
+        return classes;
+    }
+
     public Reflect(Class c) {
         targetClass = c;
 
@@ -40,6 +50,16 @@ public class Reflect {
                 getMethods.add(m);
             if (name.indexOf(SET_PREFIX) == 0)
                 setMethods.add(m);
+        }
+    }
+
+    public T newInstance(Object... args) {
+        try {
+            Constructor<T> c = targetClass.getDeclaredConstructor(getTypes(args));
+            c.setAccessible(true);
+            return c.newInstance(args);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -63,11 +83,11 @@ public class Reflect {
         return invoke(name, paramTypes, obj, args, methods.iterator());
     }
 
-    protected Object invoke(String name, Object obj, Object[] args, Iterator<Method> methods) {
+    private Object invoke(String name, Object obj, Object[] args, Iterator<Method> methods) {
         return invoke(name, null, obj, args, methods);
     }
 
-    protected Object invoke(String name, Object[] paramTypes, Object obj, Object[] args, Iterator<Method> methods) {
+    private Object invoke(String name, Object[] paramTypes, Object obj, Object[] args, Iterator<Method> methods) {
         while (methods.hasNext()) {
             Method m = methods.next();
             if (m.getName().equals(name))

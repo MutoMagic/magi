@@ -1,6 +1,5 @@
 package org.moebuff.magi.beatmap;
 
-import org.moebuff.magi.util.PathUtil;
 import org.moebuff.magi.util.Reflect;
 import org.moebuff.magi.util.Stream;
 import org.moebuff.magi.util.StringUtil;
@@ -13,93 +12,136 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 /**
- * ini文件工具
+ * 类ini文件解析工具
  *
  * @author MuTo
  */
 public abstract class ResolverKit<T extends ResolverKit> {
+    public static final String SYMBOL_ASSIGNMENT = ":";
     public static final int RESTYPE_ATTR = 0;
     public static final int RESTYPE_LINE = 1;
-    public static final int RESTYPE_EXEC = 2;
 
-    private Class type = this.getClass();//当前对象类型
-    private Reflect reflect = new Reflect(type);//type的反射工具
-    //for copy
+    private Class type;//当前对象类型
+    private Reflect<T> reflect;//type的反射工具
     private Map<String, Section> sections;//<SectionName,Section>
-    private Map<String, Field> sectionFields;//<SectionName.FieldName,Field>
-    private Map<String, String> attributes;//<SectionName.属性名,属性值>
+    private Map<String, List<Field>> sectionFields;//<SectionName,Fields>
+    private Map<String, String> attributes;//<SectionName.属性名|SectionName[index],属性值|行>
+
+    ResolverKit() {
+        type = this.getClass();
+        reflect = new Reflect(type);
+        sections = new HashMap();
+        sectionFields = new HashMap();
+
+        List<Field> fieldList = null;
+        for (Field f : type.getDeclaredFields()) {
+            Class type = f.getType();
+            if (type != String.class && type != List.class)
+                continue;
+
+            Section sec = f.getAnnotation(Section.class);
+            if (sec != null) {
+                sections.put(sec.value(), sec);
+                sectionFields.put(sec.value(), fieldList = new ArrayList());
+            }
+            if (fieldList != null)
+                fieldList.add(f);
+        }
+    }
+
+    ResolverKit(Class c, Reflect r, HashMap sec, HashMap secfield) {
+        type = c;
+        reflect = r;
+        sections = sec;
+        sectionFields = secfield;
+    }
 
     public T read(String path) {
         return read(new File(path));
     }
 
     public T read(File f) {
-        try {
-            T t = (T) type.newInstance();
-
-            //copy attr
-            t.setSections(sections = new HashMap());
-            t.setSectionFields(sectionFields = new HashMap());
-            t.setAttributes(attributes = new HashMap());
-
-            analyzeClass();
-            anaylzeFile(f, t);//解析文件
-
-            return t;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        T t = reflect.newInstance(type, reflect, sections, sectionFields);
+        t.setAttributes(attributes = new HashMap());
+        anaylzeFile(f);//解析文件
+        crossFile(t);//关联属性
+        sync();//更新原有数据
+        return t;
     }
 
-    private void analyzeClass() {
-        String sectionName = "";
-        for (Field f : type.getDeclaredFields()) {
-            Section sec = f.getAnnotation(Section.class);
-            if (sec != null) {
-                sectionName = sec.value();
-                sections.put(sec.value(), sec);
-            }
-            sectionFields.put(StringUtil.cmdStyle(sectionName, f.getName()), f);
-        }
-    }
-
-    private void anaylzeFile(File f, T t) throws Exception {
+    private void anaylzeFile(File f) {
         BufferedReader reader = null;
         try {
             int num = 1;
-            Section sec = null;
             String sectionName = "";
+            Section sec = null;
+            boolean lineAttr = false;//是否保留一行
             reader = new BufferedReader(new FileReader(f));
             for (String line = null; (line = reader.readLine()) != null; ) {
                 if ((line = line.trim()).isEmpty())
                     continue;//排除空行
+
                 if (line.matches("^\\[.+\\]$")) {
                     sectionName = line.substring(num = 1, line.length() - 1);
                     sec = sections.get(sectionName);
-                } else if (sec != null && sec.type() == RESTYPE_ATTR) {
-                    String[] split = line.split(":");
-                    if (split.length == 2) {
-                        String name = split[0].trim();
-                        String value = split[1].trim();
-                        attributes.put(StringUtil.cmdStyle(sectionName, name), value);
-                        reflect.invokeSet(name, t, value);
-                    }
-                } else {
-                    if (sec != null && sec.type() == RESTYPE_LINE) {
-                        String fieldName = StringUtil.lowerInitial(sectionName);
-                        Field field = sectionFields.get(StringUtil.cmdStyle(sectionName, fieldName));
-                        field.setAccessible(true);
-                        List list = (List) field.get(t);
-                        list.add(line);
-                    } else if (sec != null && sec.type() == RESTYPE_EXEC)
-                        ;
-                    attributes.put(StringUtil.arrayStyle(sectionName, num++), line);
-                }
 
+                    List<Field> fieldList = sectionFields.get(sectionName);
+                    if (fieldList.size() == 1 && fieldList.get(0).getType() == List.class)
+                        lineAttr = true;
+                } else if (sec != null && sec.type() == RESTYPE_ATTR && !lineAttr) {
+                    if (line.matches("^//.*$"))
+                        continue;//跳过注释
+
+                    String[] split = line.split(SYMBOL_ASSIGNMENT);
+                    String key = StringUtil.cmdStyle(sectionName, split[0].trim());
+                    if (split.length == 2)
+                        attributes.put(key, split[1].trim());
+                    else
+                        attributes.put(key, "");
+                } else
+                    attributes.put(StringUtil.arrayStyle(sectionName, num++ - 1), line);
             }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             Stream.close(reader);
         }
+    }
+
+    private void crossFile(Object obj) {
+        for (Iterator<String> secKeyI = sections.keySet().iterator(); secKeyI.hasNext(); ) {
+            String sectionName = secKeyI.next();
+            Section sec = sections.get(sectionName);
+            List<Field> fieldList = sectionFields.get(sectionName);
+            if (sec.type() == RESTYPE_LINE) {
+                //手动解析
+            } else {
+                Field firstField = fieldList.get(0);
+                if (fieldList.size() == 1 && firstField.getType() == List.class) {
+                    List list = (List) reflect.invokeGet(firstField.getName(), obj);
+                    String line = null;
+                    for (int i = 0; ; i++) {
+                        line = attributes.get(StringUtil.arrayStyle(sectionName, i));
+                        if (line == null)
+                            break;
+                        list.add(line);
+                    }
+                    continue;
+                }
+                for (int i = 0; i < fieldList.size(); i++) {
+                    String fieldName = fieldList.get(i).getName();
+                    String attrName = StringUtil.cmdStyle(sectionName, StringUtil.upperInitial(fieldName));
+                    reflect.invokeSet(fieldName, obj, attributes.get(attrName));
+                }
+            }
+        }
+    }
+
+    private void sync() {
+        for (Field f : type.getDeclaredFields())
+            if (f.getType() == List.class)
+                reflect.invokeSet(f.getName(), this, new ArrayList());
+        crossFile(this);
     }
 
     // Properties
@@ -113,11 +155,11 @@ public abstract class ResolverKit<T extends ResolverKit> {
         this.type = type;
     }
 
-    public Reflect getReflect() {
+    public Reflect<T> getReflect() {
         return reflect;
     }
 
-    public void setReflect(Reflect reflect) {
+    public void setReflect(Reflect<T> reflect) {
         this.reflect = reflect;
     }
 
@@ -129,11 +171,11 @@ public abstract class ResolverKit<T extends ResolverKit> {
         this.sections = sections;
     }
 
-    public Map<String, Field> getSectionFields() {
+    public Map<String, List<Field>> getSectionFields() {
         return sectionFields;
     }
 
-    public void setSectionFields(Map<String, Field> sectionFields) {
+    public void setSectionFields(Map<String, List<Field>> sectionFields) {
         this.sectionFields = sectionFields;
     }
 

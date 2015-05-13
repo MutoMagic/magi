@@ -37,13 +37,6 @@ public class BeatMap {
             Difficulty diff = Difficulty.kit.read(f);
             diffs.add(diff);
             musicMap.put(diff, PathUtil.addSeparator(path, diff.getAudioFilename()));
-
-            //test
-            System.out.println("-------------------------");
-            System.out.println(diff.getVersion());
-            if (diff.getVersion().equals("0108"))
-                for (int i = 0; i < diff.getHitObjects().size(); i++)
-                    System.out.println(diff.getHitObjects().get(i));
         }
     }
 
