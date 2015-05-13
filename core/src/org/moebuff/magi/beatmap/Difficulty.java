@@ -1,6 +1,7 @@
 package org.moebuff.magi.beatmap;
 
 import org.moebuff.magi.util.Reflect;
+import org.moebuff.magi.util.StringUtil;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -50,8 +51,8 @@ public class Difficulty extends ResolverKit<Difficulty> {
     private String sliderMultiplier;//滑条速度
     private String sliderTickRate;//每拍滑条小点个数
     @Section(value = "Events", resolver = EventsResolver.class)//事件
-    private String bgAndVideo;//背景图片和视频
-    private String beakPeriods;//休息时间点
+    private List<String> bgAndVideo = new ArrayList();//背景图片和视频
+    private List<String> beakPeriods = new ArrayList();//休息时间点
     //故事模式图层Storyboard Layer
     private String sbLayer0;//Background
     private String sbLayer1;//Fail
@@ -308,19 +309,19 @@ public class Difficulty extends ResolverKit<Difficulty> {
         this.sliderTickRate = sliderTickRate;
     }
 
-    public String getBgAndVideo() {
+    public List<String> getBgAndVideo() {
         return bgAndVideo;
     }
 
-    public void setBgAndVideo(String bgAndVideo) {
+    public void setBgAndVideo(List<String> bgAndVideo) {
         this.bgAndVideo = bgAndVideo;
     }
 
-    public String getBeakPeriods() {
+    public List<String> getBeakPeriods() {
         return beakPeriods;
     }
 
-    public void setBeakPeriods(String beakPeriods) {
+    public void setBeakPeriods(List<String> beakPeriods) {
         this.beakPeriods = beakPeriods;
     }
 
@@ -399,10 +400,22 @@ public class Difficulty extends ResolverKit<Difficulty> {
     // Internal
     // -------------------------------------------------------------------------
 
-    public static class EventsResolver implements SectionResolver {
+    public static class EventsResolver extends DefaultResolver {
         @Override
         public void analyze(Object obj, String name, List<Field> fields, Map<String, String> attrs) throws Exception {
+            String tag = "";
+            for (int i = 0; ; i++) {
+                String line = attrs.get(StringUtil.arrayStyle(name, i));
+                if (line == null)
+                    break;
 
+                if (line.matches("^//.*$"))
+                    tag = line.substring(2);
+                else if (tag.equals("Background and Video events"))
+                    getFieldList("bgAndVideo", fields, obj).add(line);
+                else if (tag.equals("Break Periods"))
+                    getFieldList("beakPeriods", fields, obj).add(line);
+            }
         }
     }
 }

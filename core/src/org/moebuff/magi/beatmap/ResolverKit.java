@@ -224,9 +224,8 @@ public abstract class ResolverKit<T extends ResolverKit> {
             Field first = fields.get(0);
             if (fields.size() == 1 && first.getType() == List.class) {
                 List list = (List) first.get(obj);
-                String line = null;
                 for (int i = 0; ; i++) {
-                    line = attrs.get(StringUtil.arrayStyle(name, i));
+                    String line = attrs.get(StringUtil.arrayStyle(name, i));
                     if (line == null)
                         break;
                     list.add(line);
@@ -234,6 +233,17 @@ public abstract class ResolverKit<T extends ResolverKit> {
             } else
                 for (Field f : fields)
                     f.set(obj, attrs.get(StringUtil.cmdStyle(name, StringUtil.upperInitial(f.getName()))));
+        }
+
+        public Field getField(String name, List<Field> fields) {
+            for (Field f : fields)
+                if (f.getName().equals(name))
+                    return f;
+            return null;
+        }
+
+        public List getFieldList(String name, List<Field> fields, Object obj) throws IllegalAccessException {
+            return (List) getField(name, fields).get(obj);
         }
     }
 }

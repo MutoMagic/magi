@@ -19,14 +19,18 @@ public class Magi extends ApplicationAdapter {
 
     @Override
     public void create() {
-        batch = new SpriteBatch();
-        img = new Texture("skin/badlogic.jpg");
-        region = new TextureRegion(img, 0, 0, 160, 160);
-
         MapLoader loader = new MapLoader();
         Iterator<BeatMap> bi = loader.getBaetMaps().iterator();
-        String musicName = bi.next().getMusicMap().values().iterator().next();
+        BeatMap map = bi.next();
+        String musicName = map.getMusicMap().values().iterator().next();
         new MusicController(musicName).loopPlay();
+        String bkg = map.getDiffs().iterator().next().getBgAndVideo().get(0).substring(5, 11);
+        for (String s : map.getDiffs().iterator().next().getHitObjects())
+            System.out.println(s);
+
+        batch = new SpriteBatch();
+        img = new Texture(map.getPath() + "/" + bkg);
+        //region = new TextureRegion(img, 0, 0, 160, 160);
     }
 
     @Override
@@ -34,8 +38,8 @@ public class Magi extends ApplicationAdapter {
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
-        //batch.draw(img, 100, 100);
-        batch.draw(region, 100, 100);
+        batch.draw(img, 0, 0);
+        //batch.draw(region, 100, 100);
         batch.end();
     }
 
