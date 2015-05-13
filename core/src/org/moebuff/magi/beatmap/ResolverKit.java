@@ -29,10 +29,6 @@ import java.util.*;
  * @author MuTo
  */
 public abstract class ResolverKit<T extends ResolverKit> {
-    public static final String SYMBOL_ASSIGNMENT = ":";
-    public static final int RESTYPE_ATTR = 0;
-    public static final int RESTYPE_LINE = 1;
-
     private Class type;//当前对象类型
     private Reflect<T> reflect;//type的反射工具
     private Map<String, Section> sections;//<SectionName,Section>
@@ -62,16 +58,16 @@ public abstract class ResolverKit<T extends ResolverKit> {
         }
     }
 
-    ResolverKit(Class c, Reflect r, HashMap sec, HashMap secfield) {
-        type = c;
-        reflect = r;
-        sections = sec;
-        sectionFields = secfield;
+    ResolverKit(Class type, Reflect reflect, HashMap sections, HashMap sectionFields) {
+        this.type = type;
+        this.reflect = reflect;
+        this.sections = sections;
+        this.sectionFields = sectionFields;
     }
 
     public T reload() {
         attributes = new HashMap();
-        anaylzeFile(document);
+        load(document);
         sync();
         return (T) this;
     }
@@ -82,7 +78,7 @@ public abstract class ResolverKit<T extends ResolverKit> {
         for (Field f : type.getDeclaredFields())
             if (f.getType() == List.class)
                 reflect.invokeSet(f.getName(), this, new ArrayList());
-        crossFile(this);
+        cross(this);
     }
 
     public T read(String path) {
@@ -93,19 +89,20 @@ public abstract class ResolverKit<T extends ResolverKit> {
         T t = reflect.newInstance(type, reflect, sections, sectionFields);
         t.setDocument(document = f);
         t.setAttributes(attributes = new HashMap());
-        anaylzeFile(f);
-        crossFile(t);
+
+        load(f);
+        cross(t);
         return t;
     }
 
-    //解析文件
-    private void anaylzeFile(File f) {
+    private void load(File f) {
         BufferedReader reader = null;
         try {
             int num = 1;
             String sectionName = "";
             Section sec = null;
-            boolean lineAttr = false;//是否保留一行
+            boolean keepLine = false;//保留一行
+
             reader = new BufferedReader(new FileReader(f));
             for (String line = null; (line = reader.readLine()) != null; ) {
                 if ((line = line.trim()).isEmpty())
@@ -115,14 +112,13 @@ public abstract class ResolverKit<T extends ResolverKit> {
                     sectionName = line.substring(num = 1, line.length() - 1);
                     sec = sections.get(sectionName);
 
-                    List<Field> fieldList = sectionFields.get(sectionName);
-                    if (fieldList.size() == 1 && fieldList.get(0).getType() == List.class)
-                        lineAttr = true;
-                } else if (sec != null && sec.type() == RESTYPE_ATTR && !lineAttr) {
+                    List<Field> fields = sectionFields.get(sectionName);
+                    keepLine = fields.size() == 1 && fields.get(0).getType() == List.class;
+                } else if (sec != null && sec.resolver() == DefaultResolver.class && !keepLine) {
                     if (line.matches("^//.*$"))
                         continue;//跳过注释
 
-                    String[] split = line.split(SYMBOL_ASSIGNMENT);
+                    String[] split = line.split(":");
                     String key = StringUtil.cmdStyle(sectionName, split[0].trim());
                     if (split.length == 2)
                         attributes.put(key, split[1].trim());
@@ -138,33 +134,18 @@ public abstract class ResolverKit<T extends ResolverKit> {
         }
     }
 
-    //关联属性
-    private void crossFile(Object obj) {
-        for (Iterator<String> secKeyI = sections.keySet().iterator(); secKeyI.hasNext(); ) {
-            String sectionName = secKeyI.next();
-            Section sec = sections.get(sectionName);
-            List<Field> fieldList = sectionFields.get(sectionName);
-            if (sec.type() == RESTYPE_LINE) {
-                reflect.invoke("analyze" + StringUtil.upperInitial(sectionName), obj);
-            } else {
-                Field firstField = fieldList.get(0);
-                if (fieldList.size() == 1 && firstField.getType() == List.class) {
-                    List list = (List) reflect.invokeGet(firstField.getName(), obj);
-                    String line = null;
-                    for (int i = 0; ; i++) {
-                        line = attributes.get(StringUtil.arrayStyle(sectionName, i));
-                        if (line == null)
-                            break;
-                        list.add(line);
-                    }
-                    continue;
-                }
-                for (int i = 0; i < fieldList.size(); i++) {
-                    String fieldName = fieldList.get(i).getName();
-                    String attrName = StringUtil.cmdStyle(sectionName, StringUtil.upperInitial(fieldName));
-                    reflect.invokeSet(fieldName, obj, attributes.get(attrName));
-                }
+    private void cross(Object obj) {
+        try {
+            for (Iterator<String> i = sections.keySet().iterator(); i.hasNext(); ) {
+                String name = i.next();
+                Section sec = sections.get(name);
+                List<Field> fields = sectionFields.get(name);
+                for (Field f : fields)
+                    f.setAccessible(true);
+                sec.resolver().newInstance().analyze(obj, name, fields, attributes);
             }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -233,10 +214,36 @@ public abstract class ResolverKit<T extends ResolverKit> {
     public @interface Section {
         String value();
 
-        int type() default RESTYPE_ATTR;
+        Class<? extends SectionResolver> resolver() default DefaultResolver.class;
+    }
+
+    public interface SectionResolver {
+        void analyze(Object obj, String name, List<Field> fields, Map<String, String> attrs) throws Exception;
+    }
+
+    public static class DefaultResolver implements SectionResolver {
+        @Override
+        public void analyze(Object obj, String name, List<Field> fields, Map<String, String> attrs) throws Exception {
+            Field first = fields.get(0);
+            if (fields.size() == 1 && first.getType() == List.class) {
+                List list = (List) first.get(obj);
+                String line = null;
+                for (int i = 0; ; i++) {
+                    line = attrs.get(StringUtil.arrayStyle(name, i));
+                    if (line == null)
+                        break;
+                    list.add(line);
+                }
+            } else
+                for (Field f : fields)
+                    f.set(obj, attrs.get(StringUtil.cmdStyle(name, StringUtil.upperInitial(f.getName()))));
+        }
     }
 
     public static void main(String[] args) {
-        Difficulty.kit.read(MapLoader.SONGPATH + "72217 Zips - Heisei Cataclysm/Zips - Heisei Cataclysm (Dark Fang) [0108].osu");
+        Difficulty diff = Difficulty.kit.read(MapLoader.SONGPATH + "72217 Zips - Heisei Cataclysm/Zips - Heisei Cataclysm (Dark Fang) [0108].osu");
+
+//        for (String s : diff.getHitObjects())
+//            System.out.println(s);
     }
 }

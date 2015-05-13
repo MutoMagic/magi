@@ -2,9 +2,11 @@ package org.moebuff.magi.beatmap;
 
 import org.moebuff.magi.util.Reflect;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 谱面难度
@@ -47,7 +49,7 @@ public class Difficulty extends ResolverKit<Difficulty> {
     private String approachRate;//出现物品速度：数字越大则出现速度越快(0-10)
     private String sliderMultiplier;//滑条速度
     private String sliderTickRate;//每拍滑条小点个数
-    @Section(value = "Events", type = RESTYPE_LINE)//事件
+    @Section(value = "Events", resolver = EventsResolver.class)//事件
     private String bgAndVideo;//背景图片和视频
     private String beakPeriods;//休息时间点
     //故事模式图层Storyboard Layer
@@ -67,12 +69,8 @@ public class Difficulty extends ResolverKit<Difficulty> {
     public Difficulty() {
     }
 
-    public Difficulty(Class c, Reflect r, HashMap sec, HashMap secfield) {
-        super(c, r, sec, secfield);
-    }
-
-    public void analyzeEvents() {
-        System.out.println(233);
+    public Difficulty(Class type, Reflect reflect, HashMap sections, HashMap sectionFields) {
+        super(type, reflect, sections, sectionFields);
     }
 
     // Properties
@@ -396,5 +394,15 @@ public class Difficulty extends ResolverKit<Difficulty> {
 
     public void setHitObjects(List<String> hitObjects) {
         this.hitObjects = hitObjects;
+    }
+
+    // Internal
+    // -------------------------------------------------------------------------
+
+    public static class EventsResolver implements SectionResolver {
+        @Override
+        public void analyze(Object obj, String name, List<Field> fields, Map<String, String> attrs) throws Exception {
+            System.out.println(2333);
+        }
     }
 }
