@@ -2,11 +2,9 @@ package org.moebuff.magi.beatmap;
 
 import org.moebuff.magi.util.Reflect;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 谱面难度
