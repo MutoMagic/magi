@@ -17,10 +17,7 @@ import java.util.*;
  * 约定：
  * 1.属性必须是{@link String} 或{@link List}
  * 2.String保存键值对的值，List保存行。
- * 3.键值对的赋值符号为SYMBOL_ASSIGNMENT
- * 4.解析类型默认为RESTYPE_ATTR
- * 5.解析类型为RESTYPE_LINE时，需手动声明解析方法。方法名：analyze+SectionName
- * 6.继承后必须重写构造方法。
+ * 3.继承后必须重写构造方法。
  * 注意：
  * 1.创建新对象会初始化工具类，此过程重复执行会降低效率。若能重用请调用带参构造方法。
  * 2.不要尝试使用{@link #read(File)} 来更新原有数据，即使事后调用{@link #sync()}，
@@ -238,12 +235,5 @@ public abstract class ResolverKit<T extends ResolverKit> {
                 for (Field f : fields)
                     f.set(obj, attrs.get(StringUtil.cmdStyle(name, StringUtil.upperInitial(f.getName()))));
         }
-    }
-
-    public static void main(String[] args) {
-        Difficulty diff = Difficulty.kit.read(MapLoader.SONGPATH + "72217 Zips - Heisei Cataclysm/Zips - Heisei Cataclysm (Dark Fang) [0108].osu");
-
-//        for (String s : diff.getHitObjects())
-//            System.out.println(s);
     }
 }

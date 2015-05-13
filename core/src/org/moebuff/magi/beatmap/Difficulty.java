@@ -402,7 +402,7 @@ public class Difficulty extends ResolverKit<Difficulty> {
     public static class EventsResolver implements SectionResolver {
         @Override
         public void analyze(Object obj, String name, List<Field> fields, Map<String, String> attrs) throws Exception {
-            System.out.println(2333);
+
         }
     }
 }
