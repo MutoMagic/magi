@@ -3,6 +3,7 @@ package org.moebuff.magi.beatmap;
 import org.moebuff.magi.util.Reflect;
 import org.moebuff.magi.util.StringUtil;
 
+import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,7 +51,7 @@ public class Difficulty extends ResolverKit<Difficulty> {
     private String approachRate;//出现物品速度：数字越大则出现速度越快(0-10)
     private String sliderMultiplier;//滑条速度
     private String sliderTickRate;//每拍滑条小点个数
-    @Section(value = "Events", resolver = EventsResolver.class)//事件
+    @Section(value = "Events", resolver = EventsResolver.class, keepNotes = true)//事件
     private List<String> bgAndVideo = new ArrayList();//背景图片和视频
     private List<String> beakPeriods = new ArrayList();//休息时间点
     //故事模式图层Storyboard Layer
@@ -62,10 +63,13 @@ public class Difficulty extends ResolverKit<Difficulty> {
     private String bgColor;//背景颜色
     @Section("TimingPoints")
     private List<String> timingPoints = new ArrayList();//timing点
+    private List<TimingPoints> timingPoints_obj = new ArrayList();
     @Section("Colours")
     private List<String> comboColours = new ArrayList();//combo颜色
-    @Section("HitObjects")
+    private List<Color> comboColours_obj = new ArrayList();
+    @Section(value = "HitObjects")
     private List<String> hitObjects = new ArrayList();//打击物件
+    private List<HitObject> hitObjects_obj = new ArrayList();
 
     public Difficulty() {
     }
@@ -397,24 +401,51 @@ public class Difficulty extends ResolverKit<Difficulty> {
         this.hitObjects = hitObjects;
     }
 
+    public List<HitObject> getHitObjects_obj() {
+        return hitObjects_obj;
+    }
+
+    public void setHitObjects_obj(List<HitObject> hitObjects_obj) {
+        this.hitObjects_obj = hitObjects_obj;
+    }
+
+    // Implementation methods
+    // -------------------------------------------------------------------------
+
+    @Override
+    protected void endOfAssignment(Difficulty t) {
+        for (String line : t.timingPoints)
+            t.timingPoints_obj.add(new TimingPoints(line));
+        for (String line : t.comboColours) {
+            int[] rgb = StringUtil.toInt(line.split(":")[1].trim().split(","));
+            t.comboColours_obj.add(new Color(rgb[0], rgb[1], rgb[2]));
+        }
+        for (String line : t.hitObjects)
+            t.hitObjects_obj.add(new HitObject(line));
+    }
+
     // Internal
     // -------------------------------------------------------------------------
 
     public static class EventsResolver extends DefaultResolver {
         @Override
         public void analyze(Object obj, String name, List<Field> fields, Map<String, String> attrs) throws Exception {
-            String tag = "";
-            for (int i = 0; ; i++) {
+            for (int i = 0, j = -1; ; i++) {
                 String line = attrs.get(StringUtil.arrayStyle(name, i));
                 if (line == null)
                     break;
 
                 if (line.matches("^//.*$"))
-                    tag = line.substring(2);
-                else if (tag.equals("Background and Video events"))
-                    getFieldList("bgAndVideo", fields, obj).add(line);
-                else if (tag.equals("Break Periods"))
-                    getFieldList("beakPeriods", fields, obj).add(line);
+                    j++;
+                else {
+                    if (j == -1)
+                        continue;
+                    Field f = fields.get(j);
+                    if (f.getType() == List.class)
+                        getFieldList(f, obj).add(line);
+                    else
+                        f.set(obj, line);
+                }
             }
         }
     }

@@ -130,6 +130,13 @@ public class StringUtil {
         return isBlank(num.toString()) ? -1 : Integer.parseInt(num.toString());
     }
 
+    public static int[] toInt(String[] array) {
+        int[] ints = new int[array.length];
+        for (int i = 0; i < array.length; i++)
+            ints[i] = toInt(array[i]);
+        return ints;
+    }
+
     /**
      * 独立数字部分，并按照原有顺序排列。
      * <p>假设s的值为 <i>9501abcd12p</i> ，该方法会将数字部分和非数字部分隔开，

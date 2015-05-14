@@ -27,9 +27,13 @@ public class MusicController {
         });
     }
 
+    public void play() {
+        music.play();
+    }
+
     public void loopPlay() {
         music.setLooping(true);
-        music.play();
+        play();
     }
 
     // Properties

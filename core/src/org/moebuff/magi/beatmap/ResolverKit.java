@@ -75,7 +75,7 @@ public abstract class ResolverKit<T extends ResolverKit> {
         for (Field f : type.getDeclaredFields())
             if (f.getType() == List.class)
                 reflect.invokeSet(f.getName(), this, new ArrayList());
-        cross(this);
+        assignment((T) this);
     }
 
     public T read(String path) {
@@ -88,62 +88,8 @@ public abstract class ResolverKit<T extends ResolverKit> {
         t.setAttributes(attributes = new HashMap());
 
         load(f);
-        cross(t);
+        assignment(t);
         return t;
-    }
-
-    private void load(File f) {
-        BufferedReader reader = null;
-        try {
-            int num = 1;
-            String sectionName = "";
-            Section sec = null;
-            boolean keepLine = false;//保留一行
-
-            reader = new BufferedReader(new FileReader(f));
-            for (String line = null; (line = reader.readLine()) != null; ) {
-                if ((line = line.trim()).isEmpty())
-                    continue;//排除空行
-
-                if (line.matches("^\\[.+\\]$")) {
-                    sectionName = line.substring(num = 1, line.length() - 1);
-                    sec = sections.get(sectionName);
-
-                    List<Field> fields = sectionFields.get(sectionName);
-                    keepLine = fields.size() == 1 && fields.get(0).getType() == List.class;
-                } else if (sec != null && sec.resolver() == DefaultResolver.class && !keepLine) {
-                    if (line.matches("^//.*$"))
-                        continue;//跳过注释
-
-                    String[] split = line.split(":");
-                    String key = StringUtil.cmdStyle(sectionName, split[0].trim());
-                    if (split.length == 2)
-                        attributes.put(key, split[1].trim());
-                    else
-                        attributes.put(key, "");
-                } else
-                    attributes.put(StringUtil.arrayStyle(sectionName, num++ - 1), line);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            Stream.close(reader);
-        }
-    }
-
-    private void cross(Object obj) {
-        try {
-            for (Iterator<String> i = sections.keySet().iterator(); i.hasNext(); ) {
-                String name = i.next();
-                Section sec = sections.get(name);
-                List<Field> fields = sectionFields.get(name);
-                for (Field f : fields)
-                    f.setAccessible(true);
-                sec.resolver().newInstance().analyze(obj, name, fields, attributes);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     // Properties
@@ -197,6 +143,65 @@ public abstract class ResolverKit<T extends ResolverKit> {
         this.attributes = attributes;
     }
 
+    // Implementation methods
+    // -------------------------------------------------------------------------
+
+    protected void load(File f) {
+        BufferedReader reader = null;
+        try {
+            int num = 1;
+            String sectionName = "";
+            Section sec = null;
+            boolean keepLine = false;//保留一行
+            reader = new BufferedReader(new FileReader(f));
+            for (String line = null; (line = reader.readLine()) != null; ) {
+                if ((line = line.trim()).isEmpty())
+                    continue;//排除空行
+                if (sec != null && !sec.keepNotes() && line.matches("^//.*$"))
+                    continue;//跳过注释
+
+                if (line.matches("^\\[.+\\]$")) {
+                    sectionName = line.substring(num = 1, line.length() - 1);
+                    sec = sections.get(sectionName);
+                    keepLine = sectionFields.get(sectionName).get(0).getType() == List.class;
+                } else if (sec != null && sec.resolver() == DefaultResolver.class && !keepLine) {
+                    if (line.matches("^//.*$"))
+                        line = line.substring(2);
+                    String[] split = line.split(":");
+                    String key = StringUtil.cmdStyle(sectionName, split[0].trim());
+                    if (split.length == 2)
+                        attributes.put(key, split[1].trim());
+                    else
+                        attributes.put(key, "");
+                } else
+                    attributes.put(StringUtil.arrayStyle(sectionName, num++ - 1), line);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            Stream.close(reader);
+        }
+    }
+
+    protected void assignment(T t) {
+        try {
+            for (Iterator<String> i = sections.keySet().iterator(); i.hasNext(); ) {
+                String name = i.next();
+                Section sec = sections.get(name);
+                List<Field> fields = sectionFields.get(name);
+                for (Field f : fields)
+                    f.setAccessible(true);
+                sec.resolver().newInstance().analyze(t, name, fields, attributes);
+                endOfAssignment(t);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected void endOfAssignment(T t) {
+    }
+
     // Internal
     // -------------------------------------------------------------------------
 
@@ -212,6 +217,8 @@ public abstract class ResolverKit<T extends ResolverKit> {
         String value();
 
         Class<? extends SectionResolver> resolver() default DefaultResolver.class;
+
+        boolean keepNotes() default false;
     }
 
     public interface SectionResolver {
@@ -222,7 +229,7 @@ public abstract class ResolverKit<T extends ResolverKit> {
         @Override
         public void analyze(Object obj, String name, List<Field> fields, Map<String, String> attrs) throws Exception {
             Field first = fields.get(0);
-            if (fields.size() == 1 && first.getType() == List.class) {
+            if (first.getType() == List.class) {
                 List list = (List) first.get(obj);
                 for (int i = 0; ; i++) {
                     String line = attrs.get(StringUtil.arrayStyle(name, i));
@@ -242,8 +249,8 @@ public abstract class ResolverKit<T extends ResolverKit> {
             return null;
         }
 
-        public List getFieldList(String name, List<Field> fields, Object obj) throws IllegalAccessException {
-            return (List) getField(name, fields).get(obj);
+        public List getFieldList(Field f, Object obj) throws IllegalAccessException {
+            return (List) f.get(obj);
         }
     }
 }

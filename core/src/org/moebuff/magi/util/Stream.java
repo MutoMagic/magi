@@ -14,6 +14,11 @@ public class Stream {
     private ByteArrayOutputStream decodeStream;
     private String encoding;
 
+    public Stream(InputStream in) {
+        inTrans = toOutputStream(in);
+        encoding = Encoding.getEncoding(copy(), decodeStream = new ByteArrayOutputStream());
+    }
+
     /**
      * 将输入流转换成输出流。
      *
@@ -40,11 +45,6 @@ public class Stream {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public Stream(InputStream in) {
-        inTrans = toOutputStream(in);
-        encoding = Encoding.getEncoding(copy(), decodeStream = new ByteArrayOutputStream());
     }
 
     public ByteArrayInputStream copy() {

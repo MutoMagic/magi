@@ -17,6 +17,13 @@ public class XmlHelper {
     private Document document;
     private Element root;
 
+    public XmlHelper(String path) {
+        this.path = path;
+
+        document = getDocument(this.path);
+        root = document.getRootElement();
+    }
+
     public static Document getDocument(String path) {
         try {
             return new SAXReader().read(path);
@@ -27,13 +34,6 @@ public class XmlHelper {
 
     public static Element getRoot(String path) {
         return getDocument(path).getRootElement();
-    }
-
-    public XmlHelper(String path) {
-        this.path = path;
-
-        document = getDocument(this.path);
-        root = document.getRootElement();
     }
 
     public List getRootElements(String name) {

@@ -21,23 +21,6 @@ public class Reflect<T> {
     private Set<Method> getMethods = new HashSet();
     private Set<Method> setMethods = new HashSet();
 
-    public static Object invoke(Method m, Object obj, Object... args) {
-        try {
-            return m.invoke(obj, args);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static Class[] getTypes(Object... args) {
-        if (args == null)
-            return null;
-        Class[] classes = new Class[args.length];
-        for (int i = 0; i < args.length; i++)
-            classes[i] = args[i] == null ? null : args[i].getClass();
-        return classes;
-    }
-
     public Reflect(Class c) {
         targetClass = c;
 
@@ -51,6 +34,23 @@ public class Reflect<T> {
             if (name.indexOf(SET_PREFIX) == 0)
                 setMethods.add(m);
         }
+    }
+
+    public static Object invoke(Method m, Object obj, Object... args) {
+        try {
+            return m.invoke(obj, args);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Class[] getTypes(Object... args) {
+        if (args == null)
+            return null;
+        Class[] c = new Class[args.length];
+        for (int i = 0; i < args.length; i++)
+            c[i] = args[i] == null ? null : args[i].getClass();
+        return c;
     }
 
     public T newInstance(Object... args) {
@@ -81,20 +81,6 @@ public class Reflect<T> {
 
     public Object invoke(String name, Object[] paramTypes, Object obj, Object... args) {
         return invoke(name, paramTypes, obj, args, methods.iterator());
-    }
-
-    private Object invoke(String name, Object obj, Object[] args, Iterator<Method> methods) {
-        return invoke(name, getTypes(args), obj, args, methods);
-    }
-
-    private Object invoke(String name, Object[] paramTypes, Object obj, Object[] args, Iterator<Method> methods) {
-        while (methods.hasNext()) {
-            Method m = methods.next();
-            if (m.getName().equals(name))
-                if (paramTypes == null || FixedRuntime.same(m.getParameterTypes(), paramTypes))
-                    return invoke(m, obj, args);
-        }
-        return null;
     }
 
     // Properties
@@ -138,5 +124,22 @@ public class Reflect<T> {
 
     public void setSetMethods(Set<Method> setMethods) {
         this.setMethods = setMethods;
+    }
+
+    // Implementation methods
+    // -------------------------------------------------------------------------
+
+    protected Object invoke(String name, Object obj, Object[] args, Iterator<Method> methods) {
+        return invoke(name, getTypes(args), obj, args, methods);
+    }
+
+    protected Object invoke(String name, Object[] paramTypes, Object obj, Object[] args, Iterator<Method> methods) {
+        while (methods.hasNext()) {
+            Method m = methods.next();
+            if (m.getName().equals(name))
+                if (paramTypes == null || FixedRuntime.same(m.getParameterTypes(), paramTypes))
+                    return invoke(m, obj, args);
+        }
+        return null;
     }
 }

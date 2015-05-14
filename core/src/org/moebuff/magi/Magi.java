@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import org.apache.log4j.Logger;
 import org.moebuff.magi.audio.MusicController;
 import org.moebuff.magi.beatmap.BeatMap;
 import org.moebuff.magi.beatmap.MapLoader;
@@ -13,6 +14,7 @@ import org.moebuff.magi.beatmap.MapLoader;
 import java.util.Iterator;
 
 public class Magi extends ApplicationAdapter {
+    Logger logger = Logger.getLogger(Magi.class);
     SpriteBatch batch;//画笔
     Texture img;//纹理
     TextureRegion region;//截图
