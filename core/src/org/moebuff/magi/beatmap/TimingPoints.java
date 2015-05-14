@@ -1,7 +1,9 @@
 package org.moebuff.magi.beatmap;
 
 /**
- * Created by MuTo on 2015/5/14.
+ * Timing点
+ *
+ * @author MuTo
  */
 public class TimingPoints {
     private String line;
