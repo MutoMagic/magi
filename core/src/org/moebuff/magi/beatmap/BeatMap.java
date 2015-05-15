@@ -3,8 +3,12 @@ package org.moebuff.magi.beatmap;
 import org.moebuff.magi.util.FileUtil;
 import org.moebuff.magi.util.PathUtil;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * BeatMap
@@ -40,6 +44,16 @@ public class BeatMap {
         }
     }
 
+    public String[] getBg(Difficulty d) {
+        String[] bg = d.getBgAndVideo().get(0).split(",");
+        bg[2] = bg[2].substring(1, bg[2].length() - 1);
+        return bg;
+    }
+
+    public String[] getBgVideo(Difficulty d) {
+        return d.getBgAndVideo().get(1).split(",");
+    }
+
     // Properties
     // -------------------------------------------------------------------------
 
@@ -73,5 +87,16 @@ public class BeatMap {
 
     public void setMusicMap(Map<Difficulty, String> musicMap) {
         this.musicMap = musicMap;
+    }
+
+    public static void main(String[] args) throws Exception {
+        BeatMap map = new BeatMap(MapLoader.SONGPATH + "72217 Zips - Heisei Cataclysm");
+        String[] val = map.getBg(map.getDiffs().iterator().next());
+        System.out.println(val[2]);
+        String name = map.getMusicMap().values().iterator().next();
+        System.out.println(name);
+
+//        Player p = Manager.createRealizedPlayer(new File(name).toURL());
+//        p.start();
     }
 }

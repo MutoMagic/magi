@@ -25,6 +25,8 @@ public class MusicController {
                 music.dispose();
             }
         });
+
+
     }
 
     public void play() {

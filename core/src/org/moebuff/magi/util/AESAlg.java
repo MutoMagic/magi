@@ -1,11 +1,7 @@
 package org.moebuff.magi.util;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
 
 /**
  * Created by MuTo on 2015/5/6.

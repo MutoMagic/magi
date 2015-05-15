@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import org.apache.log4j.Logger;
 import org.moebuff.magi.audio.MusicController;
 import org.moebuff.magi.beatmap.BeatMap;
+import org.moebuff.magi.beatmap.Difficulty;
 import org.moebuff.magi.beatmap.MapLoader;
 
 import java.util.Iterator;
@@ -26,12 +27,10 @@ public class Magi extends ApplicationAdapter {
         BeatMap map = bi.next();
         String musicName = map.getMusicMap().values().iterator().next();
         new MusicController(musicName).loopPlay();
-        String bkg = map.getDiffs().iterator().next().getBgAndVideo().get(0).substring(5, 11);
-        for (String s : map.getDiffs().iterator().next().getHitObjects())
-            System.out.println(s);
-
+        Difficulty diff = map.getDiffs().iterator().next();
+        
         batch = new SpriteBatch();
-        img = new Texture(map.getPath() + "/" + bkg);
+        img = new Texture(map.getPath() + "/" + map.getBg(diff)[2]);
         //region = new TextureRegion(img, 0, 0, 160, 160);
     }
 

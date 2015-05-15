@@ -68,8 +68,9 @@ project(":core") {
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        compile "dom4j:dom4j:1.6.1"
+        compile fileTree(dir: 'libs', include: '*.jar')
         compile "log4j:log4j:1.2.17"
+        compile "dom4j:dom4j:1.6.1"
         compile "cglib:cglib:3.1"
     }
 }
