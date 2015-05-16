@@ -3,6 +3,12 @@ package org.moebuff.magi.audio;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
+import com.sun.media.codec.audio.mp3.JavaDecoder;
+
+import javax.media.*;
+import javax.media.bean.playerbean.MediaPlayer;
+import java.io.File;
+import java.net.URL;
 
 /**
  * music控制器
@@ -26,7 +32,20 @@ public class MusicController {
             }
         });
 
+        try {
+            String className = "com.sun.media.codec.audio.mp3.JavaDecoder";
+            JavaDecoder decoder = new JavaDecoder();
+            Format[] in = decoder.getSupportedInputFormats();
+            Format[] out = decoder.getSupportedOutputFormats(null);
+            PlugInManager.addPlugIn(className, in, out, PlugInManager.CODEC);
+            PlugInManager.commit();
 
+            System.out.println(path);
+            Player p = Manager.createRealizedPlayer(new File(path).toURI().toURL());
+            p.start();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void play() {
@@ -35,7 +54,7 @@ public class MusicController {
 
     public void loopPlay() {
         music.setLooping(true);
-        play();
+        //play();
     }
 
     // Properties
