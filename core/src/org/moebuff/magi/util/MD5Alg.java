@@ -1,7 +1,6 @@
 package org.moebuff.magi.util;
 
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Created by MuTo on 2015/5/5.

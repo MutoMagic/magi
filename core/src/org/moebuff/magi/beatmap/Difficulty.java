@@ -55,12 +55,12 @@ public class Difficulty extends ResolverKit<Difficulty> {
     private List<String> bgAndVideo = new ArrayList();//背景图片和视频
     private List<String> beakPeriods = new ArrayList();//休息时间点
     //故事模式图层Storyboard Layer
-    private String sbLayer0;//Background
-    private String sbLayer1;//Fail
-    private String sbLayer2;//Pass
-    private String sbLayer3;//Foreground
-    private String sbSound;//故事模式声效层
-    private String bgColor;//背景颜色
+    private List<String> sbLayer0 = new ArrayList();//Background
+    private List<String> sbLayer1 = new ArrayList();//Fail
+    private List<String> sbLayer2 = new ArrayList();//Pass
+    private List<String> sbLayer3 = new ArrayList();//Foreground
+    private List<String> sbSound = new ArrayList();//故事模式声效层
+    private List<String> bgColor = new ArrayList();//背景颜色
     @Section("TimingPoints")
     private List<String> timingPoints = new ArrayList();//timing点
     private List<TimingPoints> timingPoints_obj = new ArrayList();
@@ -329,51 +329,51 @@ public class Difficulty extends ResolverKit<Difficulty> {
         this.beakPeriods = beakPeriods;
     }
 
-    public String getSbLayer0() {
+    public List<String> getSbLayer0() {
         return sbLayer0;
     }
 
-    public void setSbLayer0(String sbLayer0) {
+    public void setSbLayer0(List<String> sbLayer0) {
         this.sbLayer0 = sbLayer0;
     }
 
-    public String getSbLayer1() {
+    public List<String> getSbLayer1() {
         return sbLayer1;
     }
 
-    public void setSbLayer1(String sbLayer1) {
+    public void setSbLayer1(List<String> sbLayer1) {
         this.sbLayer1 = sbLayer1;
     }
 
-    public String getSbLayer2() {
+    public List<String> getSbLayer2() {
         return sbLayer2;
     }
 
-    public void setSbLayer2(String sbLayer2) {
+    public void setSbLayer2(List<String> sbLayer2) {
         this.sbLayer2 = sbLayer2;
     }
 
-    public String getSbLayer3() {
+    public List<String> getSbLayer3() {
         return sbLayer3;
     }
 
-    public void setSbLayer3(String sbLayer3) {
+    public void setSbLayer3(List<String> sbLayer3) {
         this.sbLayer3 = sbLayer3;
     }
 
-    public String getSbSound() {
+    public List<String> getSbSound() {
         return sbSound;
     }
 
-    public void setSbSound(String sbSound) {
+    public void setSbSound(List<String> sbSound) {
         this.sbSound = sbSound;
     }
 
-    public String getBgColor() {
+    public List<String> getBgColor() {
         return bgColor;
     }
 
-    public void setBgColor(String bgColor) {
+    public void setBgColor(List<String> bgColor) {
         this.bgColor = bgColor;
     }
 
@@ -385,12 +385,28 @@ public class Difficulty extends ResolverKit<Difficulty> {
         this.timingPoints = timingPoints;
     }
 
+    public List<TimingPoints> getTimingPoints_obj() {
+        return timingPoints_obj;
+    }
+
+    public void setTimingPoints_obj(List<TimingPoints> timingPoints_obj) {
+        this.timingPoints_obj = timingPoints_obj;
+    }
+
     public List<String> getComboColours() {
         return comboColours;
     }
 
     public void setComboColours(List<String> comboColours) {
         this.comboColours = comboColours;
+    }
+
+    public List<Color> getComboColours_obj() {
+        return comboColours_obj;
+    }
+
+    public void setComboColours_obj(List<Color> comboColours_obj) {
+        this.comboColours_obj = comboColours_obj;
     }
 
     public List<String> getHitObjects() {
@@ -437,15 +453,8 @@ public class Difficulty extends ResolverKit<Difficulty> {
 
                 if (line.matches("^//.*$"))
                     j++;
-                else {
-                    if (j == -1)
-                        continue;
-                    Field f = fields.get(j);
-                    if (f.getType() == List.class)
-                        getFieldList(f, obj).add(line);
-                    else
-                        f.set(obj, line);
-                }
+                else if (j != -1)
+                    getFieldList(fields.get(j), obj).add(line);
             }
         }
     }

@@ -88,15 +88,4 @@ public class BeatMap {
     public void setMusicMap(Map<Difficulty, String> musicMap) {
         this.musicMap = musicMap;
     }
-
-    public static void main(String[] args) throws Exception {
-        BeatMap map = new BeatMap(MapLoader.SONGPATH + "72217 Zips - Heisei Cataclysm");
-        String[] val = map.getBg(map.getDiffs().iterator().next());
-        System.out.println(val[2]);
-        String name = map.getMusicMap().values().iterator().next();
-        System.out.println(name);
-
-//        Player p = Manager.createRealizedPlayer(new File(name).toURL());
-//        p.start();
-    }
 }

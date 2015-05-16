@@ -1,8 +1,5 @@
 package org.moebuff.magi.util;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
-
 import java.io.*;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -137,20 +134,6 @@ public class Encoding {
         try {
             return URLDecoder.decode(url, enc);
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    //base64编码
-    public static String Base64Encode(byte[] b) {
-        return new BASE64Encoder().encode(b);
-    }
-
-    //base64解码
-    public static byte[] Base64Decode(String s) {
-        try {
-            return new BASE64Decoder().decodeBuffer(s);
-        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

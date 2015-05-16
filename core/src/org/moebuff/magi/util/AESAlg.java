@@ -1,10 +1,14 @@
 package org.moebuff.magi.util;
 
+import org.apache.commons.codec.binary.Base64;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Created by MuTo on 2015/5/6.
+ * AES-128
+ *
+ * @author MuTo
  */
 public class AESAlg {
     public static final String ALGORITHM = "AES";
@@ -15,7 +19,7 @@ public class AESAlg {
         try {
             Cipher c = Cipher.getInstance(ALGORITHM);
             c.init(Cipher.ENCRYPT_MODE, KEY);
-            return Encoding.Base64Encode(c.doFinal(val.getBytes(Encoding.DEFAULT)));
+            return Base64.encodeBase64String(c.doFinal(val.getBytes(Encoding.DEFAULT)));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -26,7 +30,7 @@ public class AESAlg {
         try {
             Cipher c = Cipher.getInstance(ALGORITHM);
             c.init(Cipher.DECRYPT_MODE, KEY);
-            return new String(c.doFinal(Encoding.Base64Decode(val)), Encoding.DEFAULT);
+            return new String(c.doFinal(Base64.decodeBase64(val)), Encoding.DEFAULT);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
