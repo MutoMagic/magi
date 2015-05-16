@@ -66,7 +66,7 @@ public class Difficulty extends ResolverKit<Difficulty> {
     private List<TimingPoints> timingPoints_obj = new ArrayList();
     @Section("Colours")
     private List<String> comboColours = new ArrayList();//combo颜色
-    private List<Color> comboColours_obj = new ArrayList();
+    private List<int[]> comboColours_obj = new ArrayList();//rgb array
     @Section(value = "HitObjects")
     private List<String> hitObjects = new ArrayList();//打击物件
     private List<HitObject> hitObjects_obj = new ArrayList();
@@ -401,11 +401,11 @@ public class Difficulty extends ResolverKit<Difficulty> {
         this.comboColours = comboColours;
     }
 
-    public List<Color> getComboColours_obj() {
+    public List<int[]> getComboColours_obj() {
         return comboColours_obj;
     }
 
-    public void setComboColours_obj(List<Color> comboColours_obj) {
+    public void setComboColours_obj(List<int[]> comboColours_obj) {
         this.comboColours_obj = comboColours_obj;
     }
 
@@ -432,10 +432,8 @@ public class Difficulty extends ResolverKit<Difficulty> {
     protected void endOfAssignment(Difficulty t) {
         for (String line : t.timingPoints)
             t.timingPoints_obj.add(new TimingPoints(line));
-        for (String line : t.comboColours) {
-            int[] rgb = StringUtil.toInt(line.split(":")[1].trim().split(","));
-            t.comboColours_obj.add(new Color(rgb[0], rgb[1], rgb[2]));
-        }
+        for (String line : t.comboColours)
+            t.comboColours_obj.add(StringUtil.toInt(line.split(":")[1].trim().split(",")));
         for (String line : t.hitObjects)
             t.hitObjects_obj.add(new HitObject(line));
     }
