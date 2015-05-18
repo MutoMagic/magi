@@ -19,6 +19,8 @@ public class MusicController {
     private FileHandle handle;
     private Music music;
     private OnCompletionListener onCompletionListener;
+    private Object startSync = new Object();
+    private PlayThread thread;
 
     public MusicController(String path) {
         handle = Gdx.files.internal(path);
@@ -33,13 +35,30 @@ public class MusicController {
         });
     }
 
-    public void play() {
-        music.play();
+    protected void play() {
+        synchronized (startSync) {
+            try {
+                music.play();
+                float all = 0;
+                while (music.isPlaying()) {
+                    float now = music.getPosition();
+                    if (all == now)
+                        continue;
+                    all = now;
+                    System.out.println(all);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void loopPlay() {
-        music.setLooping(true);
-        play();
+        synchronized (startSync) {
+            music.setLooping(true);
+            thread = new PlayThread(this);
+            thread.start();
+        }
     }
 
     // Properties
@@ -74,5 +93,18 @@ public class MusicController {
 
     public interface OnCompletionListener {
         void onCompletion(Music music);
+    }
+
+    public class PlayThread extends Thread {
+        private MusicController controller;
+
+        public PlayThread(MusicController controller) {
+            this.controller = controller;
+        }
+
+        @Override
+        public void run() {
+            controller.play();
+        }
     }
 }

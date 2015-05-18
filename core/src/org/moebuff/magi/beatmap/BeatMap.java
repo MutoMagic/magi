@@ -1,11 +1,8 @@
 package org.moebuff.magi.beatmap;
 
-import com.sun.media.codec.audio.mp3.JavaDecoder;
 import org.moebuff.magi.util.FileUtil;
 import org.moebuff.magi.util.PathUtil;
 
-import javax.media.*;
-import javax.media.protocol.DataSource;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.HashMap;
@@ -47,16 +44,6 @@ public class BeatMap {
         }
     }
 
-    public String[] getBg(Difficulty d) {
-        String[] bg = d.getBgAndVideo().get(0).split(",");
-        bg[2] = bg[2].substring(1, bg[2].length() - 1);
-        return bg;
-    }
-
-    public String[] getBgVideo(Difficulty d) {
-        return d.getBgAndVideo().get(1).split(",");
-    }
-
     // Properties
     // -------------------------------------------------------------------------
 
@@ -90,20 +77,5 @@ public class BeatMap {
 
     public void setMusicMap(Map<Difficulty, String> musicMap) {
         this.musicMap = musicMap;
-    }
-
-    public static void main(String[] args) {
-        String path = MapLoader.SONGPATH + "72217 Zips - Heisei Cataclysm\\IA  Heisei Kataku.mp3";
-        path = MapLoader.SONGPATH + "81051 redalice feat ayumi nomiya - little star\\Little Star.mp3";
-
-        try {
-            //JavaDecoder.main(null);
-
-            System.out.println(path);
-            Player p = Manager.createRealizedPlayer(new File(path).toURI().toURL());
-            p.start();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }

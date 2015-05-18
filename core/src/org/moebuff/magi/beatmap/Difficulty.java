@@ -78,6 +78,16 @@ public class Difficulty extends ResolverKit<Difficulty> {
         super(type, reflect, sections, sectionFields);
     }
 
+    public String[] getBg() {
+        String[] bg = bgAndVideo.get(0).split(",");
+        bg[2] = bg[2].substring(1, bg[2].length() - 1);
+        return bg;
+    }
+
+    public String[] getBgVideo() {
+        return bgAndVideo.get(1).split(",");
+    }
+
     // Properties
     // -------------------------------------------------------------------------
 

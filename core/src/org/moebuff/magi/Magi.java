@@ -31,7 +31,7 @@ public class Magi extends ApplicationAdapter {
         Difficulty diff = map.getDiffs().iterator().next();
 
         batch = new SpriteBatch();
-        img = new Texture(map.getPath() + "/" + map.getBg(diff)[2]);
+        img = new Texture(map.getPath() + "/" + diff.getBg()[2]);
     }
 
     @Override
