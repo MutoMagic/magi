@@ -31,21 +31,6 @@ public class MusicController {
                 music.dispose();
             }
         });
-
-        try {
-            String className = "com.sun.media.codec.audio.mp3.JavaDecoder";
-            JavaDecoder decoder = new JavaDecoder();
-            Format[] in = decoder.getSupportedInputFormats();
-            Format[] out = decoder.getSupportedOutputFormats(null);
-            PlugInManager.addPlugIn(className, in, out, PlugInManager.CODEC);
-            PlugInManager.commit();
-
-            System.out.println(path);
-            Player p = Manager.createRealizedPlayer(new File(path).toURI().toURL());
-            p.start();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void play() {
@@ -54,7 +39,7 @@ public class MusicController {
 
     public void loopPlay() {
         music.setLooping(true);
-        //play();
+        play();
     }
 
     // Properties
