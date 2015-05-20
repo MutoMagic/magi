@@ -27,7 +27,7 @@ public class Magi extends ApplicationAdapter {
         Iterator<BeatMap> bi = loader.getBaetMaps().iterator();
         BeatMap map = bi.next();
         String musicName = map.getMusicMap().values().iterator().next();
-        new MusicController(musicName).loopPlay();
+        new MusicController(musicName).start();
         Difficulty diff = map.getDiffs().iterator().next();
 
         batch = new SpriteBatch();

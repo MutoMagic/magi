@@ -19,7 +19,6 @@ public class MusicController {
     private FileHandle handle;
     private Music music;
     private OnCompletionListener onCompletionListener;
-    private Object startSync = new Object();
     private PlayThread thread;
 
     public MusicController(String path) {
@@ -35,30 +34,13 @@ public class MusicController {
         });
     }
 
-    protected void play() {
-        synchronized (startSync) {
-            try {
-                music.play();
-                float all = 0;
-                while (music.isPlaying()) {
-                    float now = music.getPosition();
-                    if (all == now)
-                        continue;
-                    all = now;
-                    System.out.println(all);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+    public void start() {
+        thread = new PlayThread(this);
+        thread.start();
     }
 
-    public void loopPlay() {
-        synchronized (startSync) {
-            music.setLooping(true);
-            thread = new PlayThread(this);
-            thread.start();
-        }
+    public void looping(boolean isLooping) {
+        music.setLooping(isLooping);
     }
 
     // Properties
@@ -86,6 +68,13 @@ public class MusicController {
 
     public void setOnCompletionListener(OnCompletionListener onCompletionListener) {
         this.onCompletionListener = onCompletionListener;
+    }
+
+    // Implementation methods
+    // -------------------------------------------------------------------------
+
+    protected void play() {
+        music.play();
     }
 
     // Internal
