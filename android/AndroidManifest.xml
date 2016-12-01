@@ -1,26 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.moebuff.magi.android"
-    android:versionCode="1"
-    android:versionName="1.0" >
+          package="com.moebuff.magi"
+          android:versionCode="1"
+          android:versionName="1.0">
 
-    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="22" />
+    <!--<uses-sdk android:minSdkVersion="8" android:targetSdkVersion="20"/>-->
 
     <application
-        android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/GdxTheme" >
+            android:allowBackup="true"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/app_name"
+            android:theme="@style/GdxTheme">
         <activity
-            android:name="org.moebuff.magi.android.AndroidLauncher"
-            android:label="@string/app_name" 
-            android:screenOrientation="landscape"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
+                android:name="com.moebuff.magi.AndroidLauncher"
+                android:label="@string/app_name"
+                android:screenOrientation="landscape"
+                android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
     </application>
+
+    <!-- 对sdcard的访问必须要有权限，否则在使用external时会报错 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
 </manifest>
