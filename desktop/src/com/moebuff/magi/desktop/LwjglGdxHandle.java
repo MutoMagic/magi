@@ -1,10 +1,12 @@
-package com.moebuff.magi.io;
+package com.moebuff.magi.desktop;
 
 import com.badlogic.gdx.Files.FileType;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.moebuff.magi.io.Catalog;
+import com.moebuff.magi.io.FileKit;
 import com.moebuff.magi.reflect.MethodKit;
-import com.moebuff.magi.utils.Log;
-import com.moebuff.magi.utils.OS;
+import com.moebuff.magi.reflect.Proxy;
 import com.moebuff.magi.utils.UnhandledException;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
@@ -14,22 +16,22 @@ import java.io.File;
 import java.lang.reflect.Method;
 
 /**
- * 代理 {@link FileHandle}。不支持 Android
+ * 代理 {@link FileHandle}，由于 apk 文件结构不同，所以 Android 不支持 cglib。
  *
  * @author muto
  */
-public class Handle extends FileHandle implements MethodInterceptor {
+public class LwjglGdxHandle extends FileHandle implements MethodInterceptor, Proxy, Catalog {
     private File resource;
     private FileHandle su;
 
-    protected Handle(String path, FileType type, FileHandle su) {
+    protected LwjglGdxHandle(String path, FileType type, FileHandle su) {
         super(path, type);
         resource = FileKit.getResource(path);
         this.su = su;
     }
 
     protected boolean isLocation() {
-        return OS.isDesktop && FileType.Internal == type && !file().exists();
+        return FileType.Internal == type && !file().exists();
     }
 
     @Override
@@ -98,7 +100,11 @@ public class Handle extends FileHandle implements MethodInterceptor {
 
     //---------------------------------------------------------------------------------------------
 
-    private Handle(FileHandle su) {
+    public LwjglGdxHandle() {
+        // Be used in Class.newInstance();
+    }
+
+    private LwjglGdxHandle(FileHandle su) {
         this.su = su;
     }
 
@@ -108,28 +114,34 @@ public class Handle extends FileHandle implements MethodInterceptor {
     @Override
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
         Class declaringClass = method.getDeclaringClass();
-        Log.d(declaringClass.getName());
-        if (declaringClass == Handle.class) {
+        if (declaringClass == LwjglGdxHandle.class) {
             return proxy.invokeSuper(obj, args);
         }
         Method original = MethodKit.getMethodFromSuper(su, method);
         return MethodKit.invoke(original, su, args);
     }
 
-    /**
-     * 创建动态代理
-     *
-     * @param handle 被代理的对象
-     * @return 代理后的对象
-     */
-    public static FileHandle getInstance(FileHandle handle) {
+    @Override
+    public <T> T getInstance(T obj) {
+        FileHandle handle = (FileHandle) obj;
         Enhancer en = new Enhancer();
-        en.setSuperclass(Handle.class);
-        en.setCallback(new Handle(handle));
-        return (FileHandle) en.create(new Class[]{
+        en.setSuperclass(LwjglGdxHandle.class);
+        en.setCallback(new LwjglGdxHandle(handle));
+        //noinspection unchecked
+        return (T) en.create(new Class[]{
                 String.class, FileType.class, FileHandle.class
         }, new Object[]{
                 handle.path(), handle.type(), handle
         });
+    }
+
+    @Override
+    public FileHandle getRoot() {
+        return Gdx.files.local(".csga");
+    }
+
+    @Override
+    public FileHandle getAssets() {
+        return getInstance(Gdx.files.internal(""));
     }
 }

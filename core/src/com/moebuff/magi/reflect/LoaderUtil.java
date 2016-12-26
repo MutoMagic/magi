@@ -42,11 +42,12 @@ public class LoaderUtil implements PrivilegedAction<ClassLoader> {
      * @return the Class for the given name.
      * @throws ClassNotFoundException if the specified class name could not be found
      */
-    public static Class loadClass(final String className) throws ClassNotFoundException {
+    @SuppressWarnings("unchecked")
+    public static <T> Class<T> loadClass(final String className) throws ClassNotFoundException {
         try {
-            return getThreadContextClassLoader().loadClass(className);
+            return (Class<T>) getThreadContextClassLoader().loadClass(className);
         } catch (final Throwable ignored) {
-            return Class.forName(className);
+            return (Class<T>) Class.forName(className);
         }
     }
 
@@ -54,7 +55,7 @@ public class LoaderUtil implements PrivilegedAction<ClassLoader> {
      * @param notNull 当找不到类时，若为false则返回null，为true则抛出异常
      * @see #loadClass(String)
      */
-    public static Class loadClass(final String className, final boolean notNull) {
+    public static <T> Class<T> loadClass(final String className, final boolean notNull) {
         try {
             return loadClass(className);
         } catch (ClassNotFoundException e) {

@@ -19,7 +19,6 @@ import org.slf4j.event.Level;
  *
  * @author muto
  */
-@SuppressWarnings("unchecked")
 public final class Log {
     public static void d(String m, Object... args) {
         getLogger().debug(formatMessage(m, args));

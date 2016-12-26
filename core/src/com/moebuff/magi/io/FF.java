@@ -1,10 +1,10 @@
 package com.moebuff.magi.io;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.moebuff.magi.reflect.ClassKit;
 import com.moebuff.magi.reflect.FieldKit;
+import com.moebuff.magi.reflect.LoaderUtil;
 import com.moebuff.magi.reflect.MemberUtils;
-import com.moebuff.magi.utils.OS;
 import com.moebuff.magi.utils.UnhandledException;
 
 import java.lang.reflect.Field;
@@ -21,15 +21,19 @@ public class FF {
     public static FileHandle SONGS;
     public static FileHandle SKIN;
 
+    private static final String LWJGL_GDX_HANDLE_PKG = "com.moebuff.magi.desktop.LwjglGdxHandle";
+    private static final String ANDROID_GDX_HANDLE_PKG = "com.moebuff.magi.AndroidGdxHandle";
+
     static {
-        FileHandle internal = Gdx.files.internal("");
-        if (OS.isAndroid) {
-            ROOT = Gdx.files.external("magi!caga");
-            ASSETS = internal;//由于apk文件结构不同，所以不支持cglib
-        } else {
-            ROOT = Gdx.files.local(".csga");
-            ASSETS = Handle.getInstance(internal);
+        Class<Catalog> gdxHandleClass;
+        try {
+            gdxHandleClass = LoaderUtil.loadClass(LWJGL_GDX_HANDLE_PKG);
+        } catch (ClassNotFoundException ignored) {
+            gdxHandleClass = LoaderUtil.loadClass(ANDROID_GDX_HANDLE_PKG, true);
         }
+        final Catalog dir = ClassKit.newInstance(gdxHandleClass);
+        ROOT = dir.getRoot();
+        ASSETS = dir.getAssets();
 
         for (Field f : FF.class.getFields()) {
             if (MemberUtils.isFinal(f)) continue;
@@ -61,7 +65,7 @@ public class FF {
     /**
      * 创建指定的目录，包括所有必需但不存在的父目录。注意，此操作失败时也可能已经成功地创建了一部分必需的父目录。
      *
-     * @param handle to mkdirs
+     * @param handle 需要创建的目录
      * @return 如果目录被成功创建则返回true；false表示失败或者目录已存在
      */
     public static boolean mkdirs(FileHandle handle) {

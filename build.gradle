@@ -48,6 +48,7 @@ project(":desktop") {
         compile "org.apache.logging.log4j:log4j-api:2.7"
         compile "org.apache.logging.log4j:log4j-core:2.7"
         compile "org.apache.logging.log4j:log4j-slf4j-impl:2.7"
+        compile "cglib:cglib:3.2.4"
     }
 }
 
@@ -90,7 +91,6 @@ project(":core") {
         compile "com.badlogicgames.jlayer:jlayer:1.0.1-gdx"
         compile 'com.squareup.retrofit2:retrofit:2.1.0'
         compile 'io.reactivex:rxjava:1.2.1'
-        compile "cglib:cglib:3.2.4"
         compileOnly "org.projectlombok:lombok:1.16.12"
         compile "org.slf4j:slf4j-api:1.7.21"
     }

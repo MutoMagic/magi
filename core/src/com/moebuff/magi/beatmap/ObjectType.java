@@ -8,7 +8,6 @@ import java.util.Map;
  * <p>
  * 这个 {@link #NewCombo} 是旧版的，新版是原有物件的标识+4，比如 {@link #Normal} 的nc就是 {@link #NormalNewCombo}。
  * nc 下一个颜色+4，跳过一个颜色+20，跳过两个颜色+36，跳过三个颜色+52，第n个颜色需要加4+(n-1)*16，一共八个颜色最多。
- * </p>
  *
  * @author muto
  */
