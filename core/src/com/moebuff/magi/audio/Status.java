@@ -14,6 +14,10 @@ public enum Status {
         this.value = value;
     }
 
+    public int getValue() {
+        return value;
+    }
+
     public boolean equals(Status s) {
         return this.value == s.value;
     }

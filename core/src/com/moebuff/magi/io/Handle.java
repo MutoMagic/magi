@@ -2,8 +2,8 @@ package com.moebuff.magi.io;
 
 import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.files.FileHandle;
-import com.moebuff.magi.reflect.FieldExtension;
-import com.moebuff.magi.reflect.MethodExtension;
+import com.moebuff.magi.reflect.MethodKit;
+import com.moebuff.magi.utils.Log;
 import com.moebuff.magi.utils.OS;
 import com.moebuff.magi.utils.UnhandledException;
 import net.sf.cglib.proxy.Enhancer;
@@ -11,21 +11,20 @@ import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
- * 动态代理 {@link FileHandle}
+ * 代理 {@link FileHandle}。不支持 Android
  *
  * @author muto
  */
 public class Handle extends FileHandle implements MethodInterceptor {
     private File resource;
-    private FileHandle su;//被代理的对象
+    private FileHandle su;
 
     protected Handle(String path, FileType type, FileHandle su) {
         super(path, type);
-        resource = FileExtension.getResource(path);
+        resource = FileKit.getResource(path);
         this.su = su;
     }
 
@@ -80,8 +79,8 @@ public class Handle extends FileHandle implements MethodInterceptor {
         try {
             dest.write(source.read(), false);
         } catch (Exception ex) {
-            throw UnhandledException.format(ex, "Error copying source file: %s (%s)\nTo destination: %s (%s)",
-                    source.file(), source.type(), dest.file(), dest.type());
+            throw UnhandledException.format("Error copying source file: %s (%s)\nTo destination: %s (%s)",
+                    ex, source.file(), source.type(), dest.file(), dest.type());
         }
     }
 
@@ -99,27 +98,34 @@ public class Handle extends FileHandle implements MethodInterceptor {
 
     //---------------------------------------------------------------------------------------------
 
-    private Field suf;
-
-    private Handle() {
-        suf = FieldExtension.getDeclaredField(this.getClass(), "su");
+    private Handle(FileHandle su) {
+        this.su = su;
     }
 
+    /**
+     * 重写的方法会被代理，未重写的则执行原有方法；原有表示被代理的对象。
+     */
     @Override
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-        Method target = MethodExtension.getMethod(this, method);
-        if (target == null) {
-            Object val = FieldExtension.readField(suf, obj);
-            target = MethodExtension.getMethodFromSuper(val, method);
-            return MethodExtension.invoke(target, val, args);
+        Class declaringClass = method.getDeclaringClass();
+        Log.d(declaringClass.getName());
+        if (declaringClass == Handle.class) {
+            return proxy.invokeSuper(obj, args);
         }
-        return proxy.invokeSuper(obj, args);
+        Method original = MethodKit.getMethodFromSuper(su, method);
+        return MethodKit.invoke(original, su, args);
     }
 
+    /**
+     * 创建动态代理
+     *
+     * @param handle 被代理的对象
+     * @return 代理后的对象
+     */
     public static FileHandle getInstance(FileHandle handle) {
         Enhancer en = new Enhancer();
         en.setSuperclass(Handle.class);
-        en.setCallback(new Handle());
+        en.setCallback(new Handle(handle));
         return (FileHandle) en.create(new Class[]{
                 String.class, FileType.class, FileHandle.class
         }, new Object[]{

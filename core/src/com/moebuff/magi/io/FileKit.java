@@ -14,11 +14,13 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
- * 扩充 FileUtils
+ * 文件工具
  *
  * @author muto
+ * @see FilenameUtils
+ * @see FileUtils
  */
-public class FileExtension {
+public class FileKit {
     public static final File WKINGDIR = new File("").getAbsoluteFile();
 
     /**
@@ -40,7 +42,7 @@ public class FileExtension {
     }
 
     /**
-     * 获取内部资源，该资源存在于 working directory 中；若运行的是jar，则从jar中获取。
+     * 获取内部资源，该资源位于 working directory 中；若运行的是jar，则从jar中获取。
      *
      * @param path 所需资源的路径
      * @return 指示该资源的 {@link File} 对象
@@ -55,8 +57,8 @@ public class FileExtension {
     /**
      * 测试此抽象路径名表示的文件是否是一个目录；若判断的文件不存在，则根据路径所示的文件名中是否存在后缀来判断。
      *
-     * @param path 给定的抽象路径
-     * @return 当且仅当此抽象路径名表示的文件存在且 是一个目录时，返回 true；否则返回 false
+     * @param path 给定的抽象路径名
+     * @return 当文件存在且是目录时返回 true；当文件不存在且不包含后缀名时返回 true；其他为 false。
      */
     public static boolean isDirectory(String path) {
         return isDirectory(new File(path));
@@ -75,7 +77,7 @@ public class FileExtension {
      *
      * @param path   指定的文件路径
      * @param values 格式字符串中由格式说明符引用的参数。参数的数目是可变的，可为 0。
-     * @return new File
+     * @return 由指定 {@code path} 创建的新文件对象
      */
     public static File getFile(String path, Object... values) {
         return new File(String.format(path, values));

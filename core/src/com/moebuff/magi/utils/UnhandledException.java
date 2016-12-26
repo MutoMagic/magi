@@ -1,7 +1,10 @@
 package com.moebuff.magi.utils;
 
 /**
- * 对于那些未处理的异常，将它们打包并扔出去
+ * 包装那些 已/未处理 的异常，并将它们扔出去。这些异常应在开发过程中被解决，或在运行时无效，后者通常用来记录日志。
+ * 对于那些工具类来说，大多数的异常是方便开发者 {@code debug} 而使用的，建议将其包装，并在程序中杜绝。
+ * 至于那些需要被忽略的异常，不推荐将其放置play，这样对调试很不友好；而那些需要被处理的异常，不要使用本类进行包装。
+ * （最后那些不会处理异常的，或着不想处理异常的，请右转 -> 女装山脉
  *
  * @author muto
  */
@@ -22,40 +25,36 @@ public class UnhandledException extends RuntimeException {
         super(cause);
     }
 
-    @SuppressWarnings("NewApi")
+    @SuppressWarnings("NewApi") //support in Android API 24
     protected UnhandledException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    protected static String formatMessage(String message, Object... values) {
-        return String.format(message, values);
-    }
-
     /**
-     * 使用 {@link String#format(String, Object...)} 对 message 进行格式化，并在之后用其创建一个新的异常
+     * 使用 {@link Log#formatMessage(String, Object...)} 对 message 进行格式化，并创建一个新的异常。
      *
      * @param message 包含错误信息的格式字符串
      * @param values  格式字符串中由格式说明符引用的参数。参数的数目是可变的，可为 0。
      * @return 新创建的异常对象
      */
     public static RuntimeException format(String message, Object... values) {
-        return new UnhandledException(formatMessage(message, values));
+        return new UnhandledException(Log.formatMessage(message, values));
     }
 
     /**
-     * 使用 {@link String#format(String, Object...)} 对 message 进行格式化，之后用其和指定的原因创建一个新的异常
+     * 使用 {@link Log#formatMessage(String, Object...)} 对 message 进行格式化，并用指定的原因构造一个新的异常。
      *
-     * @param cause   需要保留的原因
      * @param message 包含错误信息的格式字符串
+     * @param cause   需要保留的原因
      * @param values  格式字符串中由格式说明符引用的参数。参数的数目是可变的，可为 0。
      * @return 新创建的异常对象
      */
-    public static RuntimeException format(Throwable cause, String message, Object... values) {
-        return new UnhandledException(formatMessage(message, values), cause);
+    public static RuntimeException format(String message, Throwable cause, Object... values) {
+        return new UnhandledException(Log.formatMessage(message, values), cause);
     }
 
     /**
-     * 验证表达式，若表达式不成立则抛出异常。抛出的异常由给定的message经格式化后创建
+     * 验证表达式，若表达式不成立则抛出异常。抛出的异常由给定的 message 经格式化后创建。
      *
      * @param expression 表达式
      * @param message    包含错误信息的格式字符串
@@ -66,14 +65,14 @@ public class UnhandledException extends RuntimeException {
     }
 
     /**
-     * 验证表达式，若表达式不成立则抛出异常。抛出的异常由指定的原因和格式化后的message创建
+     * 验证表达式，若表达式不成立则抛出异常。抛出的异常由指定的原因和格式化后的 message 创建。
      *
      * @param expression 表达式
-     * @param cause      需要保留的原因
      * @param message    包含错误信息的格式字符串
+     * @param cause      需要保留的原因
      * @param values     格式字符串中由格式说明符引用的参数。参数的数目是可变的，可为 0。
      */
-    public static void validate(boolean expression, Throwable cause, String message, Object... values) {
-        if (!expression) throw format(cause, message, values);
+    public static void validate(boolean expression, String message, Throwable cause, Object... values) {
+        if (!expression) throw format(message, cause, values);
     }
 }

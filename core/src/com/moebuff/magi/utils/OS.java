@@ -1,8 +1,11 @@
 package com.moebuff.magi.utils;
 
+import com.badlogic.gdx.utils.SharedLibraryLoader;
+import com.moebuff.magi.io.FCIV;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.time.FastDateFormat;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,9 +17,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * System Util
+ * 系统工具
  *
  * @author muto
+ * @see SharedLibraryLoader
  */
 public class OS {
     public static String name = System.getProperty("os.name");
@@ -27,8 +31,13 @@ public class OS {
     public static String home = System.getProperty("user.home");
     public static String library = System.getProperty("java.library.path");
     public static String classpath = System.getProperty("java.class.path");
-    public static String project = getProjectName(OS.class);
+
+    public static String project = getProjectName(OS.class.getPackage(), 0);
+    public static String cache = FilenameUtils.concat(tmpdir, project + user);
     public static String location = StringUtils.EMPTY;
+    public static final String DEFAULT_DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
+    public static final FastDateFormat DEFAULT_DATETIME_FORMAT
+            = FastDateFormat.getInstance(DEFAULT_DATETIME_PATTERN);
 
     public static boolean isWindows = name.contains("Windows");
     public static boolean isLinux = name.contains("Linux");
@@ -41,7 +50,6 @@ public class OS {
 
     static {
         if (abi == null) abi = "";
-        tmpdir = FilenameUtils.concat(tmpdir, project + user);
         String vm = System.getProperty("java.runtime.name");
         if (vm != null && vm.contains("Android Runtime")) {
             isAndroid = true;
@@ -61,29 +69,26 @@ public class OS {
         }
     }
 
-    /**
-     * 根据指定的类所在的包获取项目名
-     */
-    public static String getProjectName(Class c) {
-        return getProjectName(c.getPackage(), 0);
+    public static String currentDateTime() {
+        return DEFAULT_DATETIME_FORMAT.format(System.currentTimeMillis());
     }
 
     /**
      * 根据指定的包获取项目名。在包的层次中，必须有一个包是项目名。若包的层次<=3，就取最后一个包名作为项目名；
-     * 若包的层次>3，在子集默认为0前提下，只取第三个，但这并不是固定的。子集表示子项目在主项目中的位置，
-     * 该位置必须体现在包的层次中，就好比主项目在层次3，子项目在层次4，那么子集为1，依次类推。子集是有取值范围的，
-     * 最大值不得超过 {@code pkg.length-3}，最小值不能低于 {@code -2}，且子集只能在层次>3的环境中使用。
+     * 若包的层次>3，在子集深度默认为0前提下，只取第三个，但这并不是固定的。子集深度表示子项目在主项目中的位置，
+     * 该位置必须体现在包的层次中，就好比主项目在层次3，子项目在层次4，那么子集深度为1，依次类推。子集深度是有取值范围的，
+     * 最大值不得超过 {@code pkg.length-3}，最小值不能低于 {@code -2}，且子集深度只能在层次>3的环境中使用。
      *
-     * @param p   包
-     * @param sub 子集
+     * @param p     包
+     * @param depth 子集深度
      * @return 项目名
      */
-    public static String getProjectName(Package p, int sub) {
+    public static String getProjectName(Package p, int depth) {
         Validate.isTrue(p != null, "Package不能为null");
         String name = p.getName();
         if (name.contains(".")) {
             String[] pkg = name.split("\\.");
-            name = pkg[pkg.length == 2 ? 1 : 2 + sub];
+            name = pkg[pkg.length == 2 ? 1 : 2 + depth];
         }
         return name;
     }
@@ -96,6 +101,8 @@ public class OS {
     public static void loadLibrary(String libraryName) {
         new OS(null).load(libraryName);
     }
+
+    //---------------------------------------------------------------------------------------------
 
     private static final HashSet<String> loadedLibraries = new HashSet<>();
 
@@ -138,15 +145,16 @@ public class OS {
                     loadFile(platformName);
                 }
                 setLoaded(libraryName);
-            } catch (Throwable e) {
-                throw UnhandledException.format(e, "Couldn't load shared library '%s' for target: %s, %s",
-                        platformName, name, is64Bit ? "64-bit" : "32-bit");
+            } catch (Throwable ex) {
+                throw UnhandledException.format("Couldn't load shared library '%s' for target: %s, %s",
+                        ex, platformName, name, is64Bit ? "64-bit" : "32-bit");
             }
         }
     }
 
     /**
-     * Extracts the source file and calls System.load. Attemps to extract and load from multiple locations.
+     * Extracts the source file and calls System.load.
+     * Attemps to extract and load from multiple locations.
      * Throws runtime exception if all fail.
      */
     private void loadFile(String sourcePath) {
@@ -154,32 +162,32 @@ public class OS {
         String fileName = new File(sourcePath).getName();
 
         // Temp directory with username in path.
-        String path = String.format("%s/%s", tmpdir, sourceCrc);
-        File f = new File(path, fileName);
-        Throwable ex = loadFile(sourcePath, sourceCrc, f);
+        String path = String.format("%s/%s", cache, sourceCrc);
+        File file = new File(path, fileName);
+        Throwable ex = loadFile(sourcePath, sourceCrc, file);
         if (ex == null) return;
 
         // System provided temp directory.
         try {
-            f = File.createTempFile(sourceCrc, null);//file can be created
-            if (f.delete() && loadFile(sourcePath, sourceCrc, f) == null) return;
-        } catch (IOException e) {
-            e.printStackTrace();//ignored
+            file = File.createTempFile(sourceCrc, null);//用于判断文件能否被创建
+            if (file.delete() && loadFile(sourcePath, sourceCrc, file) == null) return;
+        } catch (Throwable e) {
+            Log.d("ignored", e);
         }
 
         // User home.
         path = String.format("%s/.%s/%s", home, project, sourceCrc);
-        f = new File(path, fileName);
-        if (loadFile(sourcePath, sourceCrc, f) == null) return;
+        file = new File(path, fileName);
+        if (loadFile(sourcePath, sourceCrc, file) == null) return;
 
         // Relative directory.
-        f = new File(".temp/" + sourceCrc, fileName);
-        if (loadFile(sourcePath, sourceCrc, f) == null) return;
+        file = new File(".temp/" + sourceCrc, fileName);
+        if (loadFile(sourcePath, sourceCrc, file) == null) return;
 
         // Fallback to java.library.path location, eg for applets.
-        f = new File(library, sourcePath);
-        if (f.exists()) {
-            System.load(f.getAbsolutePath());
+        file = new File(library, sourcePath);
+        if (file.exists()) {
+            System.load(file.getAbsolutePath());
             return;
         }
 
@@ -199,8 +207,8 @@ public class OS {
             ZipEntry entry = file.getEntry(path);
             UnhandledException.validate(entry != null, "Couldn't find '%s' in JAR: %s", path, nativesJar);
             return file.getInputStream(entry);
-        } catch (IOException e) {
-            throw UnhandledException.format(e, "Error reading '%s' in JAR: %s", path, nativesJar);
+        } catch (IOException ex) {
+            throw UnhandledException.format("Error reading '%s' in JAR: %s", ex, path, nativesJar);
         }
     }
 
@@ -209,11 +217,11 @@ public class OS {
      */
     private Throwable loadFile(String sourcePath, String sourceCrc, File extractedFile) {
         try {
-            //无法通过路径直接获得压缩（.jar）包中的文件，必须在提取后才可使用
+            //无法直接通过路径名获取jar包中的文件，必须在提取后才可使用。
             System.load(extractFile(sourcePath, sourceCrc, extractedFile).getAbsolutePath());
             return null;
-        } catch (Throwable e) {
-            return e;
+        } catch (Throwable ex) {
+            return ex;
         }
     }
 
@@ -237,9 +245,9 @@ public class OS {
                 }
                 input.close();
                 output.close();
-            } catch (IOException e) {
-                throw UnhandledException.format(e, "Error extracting file: %s\nTo: %s",
-                        sourcePath, extractedFile.getAbsolutePath());
+            } catch (IOException ex) {
+                throw UnhandledException.format("Error extracting file: %s\nTo: %s",
+                        ex, sourcePath, extractedFile.getAbsolutePath());
             }
         }
         return extractedFile;

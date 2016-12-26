@@ -1,9 +1,9 @@
 package com.moebuff.magi.audio;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.moebuff.magi.io.FCIV;
 import com.moebuff.magi.io.FF;
 import com.moebuff.magi.utils.Operation;
-import com.moebuff.magi.utils.FCIV;
 import org.apache.commons.io.FilenameUtils;
 
 /**

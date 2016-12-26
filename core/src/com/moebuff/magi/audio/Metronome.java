@@ -3,8 +3,8 @@ package com.moebuff.magi.audio;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.moebuff.magi.io.FF;
-import com.moebuff.magi.reflect.MethodExtension;
-import com.moebuff.magi.utils.TimerTasks;
+import com.moebuff.magi.reflect.MethodKit;
+import com.moebuff.magi.utils.RepetitiveTask;
 
 import java.lang.reflect.Method;
 import java.util.Timer;
@@ -14,7 +14,7 @@ import java.util.Timer;
  *
  * @author muto
  */
-public class Metronome extends TimerTasks {
+public class Metronome extends RepetitiveTask {
     private float bpm;
     private int beat;//节拍 43=3/4
     private int section;//小节
@@ -40,7 +40,7 @@ public class Metronome extends TimerTasks {
         this.bpm = bpm;
         if (this.beat != beat) {
             String name = String.format("m%s", beat);
-            model = MethodExtension.getMethod(Metronome.class, name);
+            model = MethodKit.getMethod(Metronome.class, name);
             section = beat % 10 * 2;//beat对10取余得到个位数，乘以2将计数精确到原来的两倍
             this.beat = beat;
         }
@@ -96,7 +96,7 @@ public class Metronome extends TimerTasks {
         if (sum % 4 == 0 && count == 1) {
             play(snareDrun);//每4小节为一组，第一个音是finish
         } else {
-            MethodExtension.invoke(model, this);
+            MethodKit.invoke(model, this);
         }
 
         //计数器

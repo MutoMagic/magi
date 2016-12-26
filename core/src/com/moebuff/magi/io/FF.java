@@ -2,7 +2,7 @@ package com.moebuff.magi.io;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.moebuff.magi.reflect.FieldExtension;
+import com.moebuff.magi.reflect.FieldKit;
 import com.moebuff.magi.reflect.MemberUtils;
 import com.moebuff.magi.utils.OS;
 import com.moebuff.magi.utils.UnhandledException;
@@ -22,12 +22,13 @@ public class FF {
     public static FileHandle SKIN;
 
     static {
+        FileHandle internal = Gdx.files.internal("");
         if (OS.isAndroid) {
             ROOT = Gdx.files.external("magi!caga");
-            ASSETS = Gdx.files.internal("");
+            ASSETS = internal;//由于apk文件结构不同，所以不支持cglib
         } else {
             ROOT = Gdx.files.local(".csga");
-            ASSETS = internal("");
+            ASSETS = Handle.getInstance(internal);
         }
 
         for (Field f : FF.class.getFields()) {
@@ -39,7 +40,7 @@ public class FF {
             }
             //在运行android时会多出$change属性，这个报错会让你一脸蒙蔽，据说只会出现在IDEA中。目前已知的解决办法
             //是关掉Instant Run，具体位置在File->Settings->Build,Execution,Deployment->Instant Run
-            FieldExtension.writeField(f, null, folder);
+            FieldKit.writeField(f, null, folder);
         }
     }
 
@@ -67,9 +68,5 @@ public class FF {
         if (handle.exists()) return false;
         handle.mkdirs();
         return handle.isDirectory();
-    }
-
-    public static FileHandle internal(String path) {
-        return Handle.getInstance(Gdx.files.internal(path));
     }
 }

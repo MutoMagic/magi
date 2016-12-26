@@ -1,11 +1,13 @@
-package com.moebuff.magi.utils;
+package com.moebuff.magi.io;
 
-import com.moebuff.magi.io.FileExtension;
+import com.moebuff.magi.utils.UnhandledException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.Validate;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.zip.CRC32;
 
 /**
@@ -16,9 +18,11 @@ import java.util.zip.CRC32;
 public class FCIV {
     /**
      * 计算MD5摘要，需要注意的是 {@link DigestUtils#md5Hex(InputStream)} 在Android中无法使用。
+     *
+     * @see #encodeHexString(byte[])
      */
     public static String md5Hex(File f) {
-        return md5Hex(FileExtension.openInputStream(f));
+        return md5Hex(FileKit.openInputStream(f));
     }
 
     /**
@@ -36,16 +40,6 @@ public class FCIV {
     }
 
     /**
-     * Calculates the MD5 digest and returns the value as a 32 character hex string.
-     *
-     * @param data Data to digest
-     * @return MD5 digest as a hex string
-     */
-    public static String md5Hex(final String data) {
-        return encodeHexString(DigestUtils.md5(data));
-    }
-
-    /**
      * 虽然 {@link Hex#encodeHexString(byte[])} 方法在Desktop中可以正常使用，但在Android中会提示找不到，
      * 原因是Android内部有一个包名一样的工程，而且类名也相同，关键是没有该方法！于是导致包名冲突，JVM只会引入第一个包，
      * 第二个包在classloader加载类时判断重复而被忽略。为保证在Android中可正以常使用该方法，因此这里将其重新实现。
@@ -57,7 +51,7 @@ public class FCIV {
      * @param data a byte[] to convert to Hex characters
      * @return A String containing hexadecimal characters
      */
-    public static String encodeHexString(final byte[] data) {
+    private static String encodeHexString(final byte[] data) {
         return new String(Hex.encodeHex(data));
     }
 
@@ -70,7 +64,7 @@ public class FCIV {
     }
 
     public static String crc(File f) {
-        return crc(FileExtension.openInputStream(f));
+        return crc(FileKit.openInputStream(f));
     }
 
     /**
@@ -80,7 +74,7 @@ public class FCIV {
      * @return 16进制的 {@link Long 长整形} CRC-32
      */
     public static long crc16(InputStream input) {
-        Validate.notNull(input, "输入流不能为 null");
+        Validate.isTrue(input != null, "输入流不能为null");
         CRC32 crc = new CRC32();
         byte[] buffer = new byte[4096];
         try {
@@ -96,6 +90,6 @@ public class FCIV {
     }
 
     public static long crc16(File f) {
-        return crc16(FileExtension.openInputStream(f));
+        return crc16(FileKit.openInputStream(f));
     }
 }

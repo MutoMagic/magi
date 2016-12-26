@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.moebuff.magi.audio.Controller;
 import com.moebuff.magi.io.FF;
 import com.moebuff.magi.io.ZipPackage;
+import com.moebuff.magi.utils.Log;
 import org.apache.commons.io.FilenameUtils;
 
 public class MagiGame extends ApplicationAdapter {
@@ -20,6 +21,7 @@ public class MagiGame extends ApplicationAdapter {
         String name = FF.OSZ_420265.name();
         String base = FilenameUtils.getBaseName(name);
         FileHandle dir = FF.SONGS.child(base);
+        Log.w(dir.path());
         if (!dir.exists()) {
             FF.OSZ_420265.copyTo(FF.SONGS.child(name));
             ZipPackage.unpack(FF.SONGS.child(name).file(), dir.file());

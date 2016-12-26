@@ -1,6 +1,5 @@
 package com.moebuff.magi.io;
 
-import com.moebuff.magi.utils.FCIV;
 import com.moebuff.magi.utils.OS;
 import com.moebuff.magi.utils.UnhandledException;
 import org.apache.commons.io.IOUtils;
@@ -47,7 +46,7 @@ public class ZipPackage extends File {
                 out.mkdirs();//创建空目录
                 continue;
             }
-            FileExtension.copyToFile(read(source, entry), out);
+            FileKit.copyToFile(read(source, entry), out);
         }
     }
 
@@ -88,18 +87,18 @@ public class ZipPackage extends File {
         super(path);
         file = getFile(this);
         String crc = FCIV.crc(this);
-        tmp = FileExtension.getFile("%s/jzip/%s", OS.tmpdir, crc);
+        tmp = FileKit.getFile("%s/jzip/%s", OS.cache, crc);
         if (tmp.exists()) return;
         Enumeration<? extends ZipEntry> entries = file.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
-            FileExtension.createNewFile(new File(tmp, entry.getName()),
+            FileKit.createNewFile(new File(tmp, entry.getName()),
                     entry.isDirectory());
         }
     }
 
     public ZipPackage(File f) {
-        this(FileExtension.getCanonicalPath(f));
+        this(FileKit.getCanonicalPath(f));
     }
 
     public void unpack(File dest) {

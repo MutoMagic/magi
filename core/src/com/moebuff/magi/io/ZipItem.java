@@ -1,6 +1,5 @@
 package com.moebuff.magi.io;
 
-import com.moebuff.magi.utils.FCIV;
 import com.moebuff.magi.utils.UnhandledException;
 
 import java.io.File;
@@ -82,7 +81,7 @@ public class ZipItem extends File {
         }
         InputStream is = read();
         UnhandledException.validate(is != null, "找不到需要解压的文件 %s", getPath());
-        FileExtension.copyToFile(is, dest);
+        FileKit.copyToFile(is, dest);
     }
 
     public InputStream read() {
@@ -131,12 +130,12 @@ public class ZipItem extends File {
 
     @Override
     public String getCanonicalPath() {
-        return FileExtension.getAbsolutePath(tmp);
+        return FileKit.getAbsolutePath(tmp);
     }
 
     @Override
     public ZipItem getCanonicalFile() {
-        return new ZipItem(FileExtension.getCanonicalPath(this), pkg);
+        return new ZipItem(FileKit.getCanonicalPath(this), pkg);
     }
 
     /**
@@ -200,7 +199,7 @@ public class ZipItem extends File {
 
     @Override
     public boolean createNewFile() {
-        return FileExtension.createNewFile(tmp, false);
+        return FileKit.createNewFile(tmp, false);
     }
 
     @Override

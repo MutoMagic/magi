@@ -1,14 +1,15 @@
 package com.moebuff.magi.utils;
 
-import com.moebuff.magi.reflect.FieldExtension;
+import com.moebuff.magi.reflect.FieldKit;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * 扩充 StringUtils
+ * 字符串工具
  *
  * @author muto
+ * @see StringUtils
  */
-public class StringExtension {
+public class StringKit {
     /**
      * 首字母大写
      */
@@ -25,7 +26,7 @@ public class StringExtension {
 
         ca[0] -= 32;
         String result = new String();//对象必须是全新的
-        FieldExtension.writeConstant("value", result, ca);
+        FieldKit.writeConstant("value", result, ca);
         return result;
     }
 }

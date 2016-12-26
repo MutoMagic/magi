@@ -1,6 +1,6 @@
 package com.moebuff.magi.utils;
 
-import com.moebuff.magi.reflect.FieldExtension;
+import com.moebuff.magi.reflect.FieldKit;
 
 import java.lang.reflect.Field;
 import java.util.Locale;
@@ -32,7 +32,7 @@ public class I18N {
         for (Field f : fields) {
             String key = f.getName();
             if (bundle.containsKey(key)) {
-                FieldExtension.writeStaticField(f, bundle.getString(key));
+                FieldKit.writeStaticField(f, bundle.getString(key));
             }
         }
     }

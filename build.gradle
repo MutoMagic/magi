@@ -45,6 +45,9 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
         compile fileTree(dir: 'libs', include: '*.jar')
+        compile "org.apache.logging.log4j:log4j-api:2.7"
+        compile "org.apache.logging.log4j:log4j-core:2.7"
+        compile "org.apache.logging.log4j:log4j-slf4j-impl:2.7"
     }
 }
 
@@ -68,6 +71,7 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86"
         natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64"
         natives fileTree(dir: 'libs', include: 'natives-*.jar')
+        compile 'com.orhanobut:logger:1.15'
     }
 }
 
@@ -84,9 +88,11 @@ project(":core") {
         compile "commons-io:commons-io:2.5"
         compile "com.badlogicgames.gdx:gdx-jnigen:1.9.4"
         compile "com.badlogicgames.jlayer:jlayer:1.0.1-gdx"
-        compile "cglib:cglib:3.2.4"
         compile 'com.squareup.retrofit2:retrofit:2.1.0'
         compile 'io.reactivex:rxjava:1.2.1'
+        compile "cglib:cglib:3.2.4"
+        compileOnly "org.projectlombok:lombok:1.16.12"
+        compile "org.slf4j:slf4j-api:1.7.21"
     }
 }
 
