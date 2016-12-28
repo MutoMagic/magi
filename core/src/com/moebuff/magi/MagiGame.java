@@ -21,7 +21,7 @@ public class MagiGame extends ApplicationAdapter {
         String name = FF.OSZ_420265.name();
         String base = FilenameUtils.getBaseName(name);
         FileHandle dir = FF.SONGS.child(base);
-        Log.w(dir.path());
+        Log.i("音频路径 %s", dir.path());
         if (!dir.exists()) {
             FF.OSZ_420265.copyTo(FF.SONGS.child(name));
             ZipPackage.unpack(FF.SONGS.child(name).file(), dir.file());

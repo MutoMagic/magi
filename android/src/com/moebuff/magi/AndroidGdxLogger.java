@@ -10,7 +10,17 @@ public class AndroidGdxLogger implements ApplicationLogger {
 
     @Override
     public String getTag(Level logLevel, int depth) {
-        return "[dev]" + ReflectionUtil.getEquivalentStackTraceElement(depth + 1);
+        return ReflectionUtil.getEquivalentSte(depth + 1).toString();
+    }
+
+    @Override
+    public void trace(String tag, String message) {
+        if (logLevel >= LOG_TRACE) Log.v(tag, message);
+    }
+
+    @Override
+    public void trace(String tag, String message, Throwable exception) {
+        if (logLevel >= LOG_TRACE) Log.v(tag, message, exception);
     }
 
     @Override

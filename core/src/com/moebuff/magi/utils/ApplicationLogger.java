@@ -12,12 +12,17 @@ import org.slf4j.event.Level;
 public interface ApplicationLogger {
     float LOG_INFO = Application.LOG_INFO;
     float LOG_ERROR = Application.LOG_ERROR;
+    float LOG_TRACE = Application.LOG_DEBUG + 1;
     float LOG_WARN = (LOG_INFO + LOG_ERROR) / 2;
 
     /**
      * @param depth 深度归零，默认为 {@link #getTag(Level, int)}
      */
     String getTag(Level logLevel, int depth);
+
+    void trace(String tag, String message);
+
+    void trace(String tag, String message, Throwable exception);
 
     void warn(String tag, String message);
 

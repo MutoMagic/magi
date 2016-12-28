@@ -1,13 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<!-- 设置 status=DEBUG 查看log4j的装配过程 -->
+<Configuration status="DEBUG">
+    <Properties>
+        <Property name="LOG_HOME">.csga/logs</Property>
+        <!-- 日志备份目录 -->
+        <property name="BACKUP_HOME">${LOG_HOME}/backup</property>
+        <Property name="LOG_PATTERN">
+            %d{yyyy-MM-dd HH:mm:ss.SSS} %tp-%T/%t %p{length=1}/%c: %m%n
+        </Property>
+    </Properties>
+
     <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        <Console name="show">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
         </Console>
+
+        <!-- 开发者日志 -->
+        <RollingFile name="dev" fileName="${LOG_HOME}/last.log" immediateFlush="false"
+                     filePattern="${BACKUP_HOME}/$${date:yyyy-MM}/%d{yyyyMMdd}-%i.log.gz">
+            <ThresholdFilter level="INFO" onMatch="ACCEPT"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="170MB"/>
+                <TimeBasedTriggeringPolicy modulate="true"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
     </Appenders>
+
     <Loggers>
-        <Root level="debug">
-            <AppenderRef ref="Console"/>
+        <Root level="TRACE" includeLocation="true">
+            <AppenderRef ref="show"/>
+            <AppenderRef ref="dev"/>
         </Root>
     </Loggers>
 </Configuration>

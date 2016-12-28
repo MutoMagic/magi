@@ -171,8 +171,8 @@ public class OS {
         try {
             file = File.createTempFile(sourceCrc, null);//用于判断文件能否被创建
             if (file.delete() && loadFile(sourcePath, sourceCrc, file) == null) return;
-        } catch (Throwable e) {
-            Log.d("ignored", e);
+        } catch (Throwable ignored) {
+            Log.d(ignored.getMessage());
         }
 
         // User home.

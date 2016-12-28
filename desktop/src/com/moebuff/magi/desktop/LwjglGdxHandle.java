@@ -7,6 +7,7 @@ import com.moebuff.magi.io.Catalog;
 import com.moebuff.magi.io.FileKit;
 import com.moebuff.magi.reflect.MethodKit;
 import com.moebuff.magi.reflect.Proxy;
+import com.moebuff.magi.utils.Log;
 import com.moebuff.magi.utils.UnhandledException;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
@@ -113,8 +114,9 @@ public class LwjglGdxHandle extends FileHandle implements MethodInterceptor, Pro
      */
     @Override
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-        Class declaringClass = method.getDeclaringClass();
-        if (declaringClass == LwjglGdxHandle.class) {
+        boolean isOverride = method.getDeclaringClass() == LwjglGdxHandle.class;
+        Log.i("invokeSuper=%-5b %s", isOverride, method);
+        if (isOverride) {
             return proxy.invokeSuper(obj, args);
         }
         Method original = MethodKit.getMethodFromSuper(su, method);
@@ -122,7 +124,7 @@ public class LwjglGdxHandle extends FileHandle implements MethodInterceptor, Pro
     }
 
     @Override
-    public <T> T getInstance(T obj) {
+    public final <T> T getInstance(T obj) {
         FileHandle handle = (FileHandle) obj;
         Enhancer en = new Enhancer();
         en.setSuperclass(LwjglGdxHandle.class);

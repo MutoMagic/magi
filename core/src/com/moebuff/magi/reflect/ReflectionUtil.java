@@ -95,7 +95,7 @@ public class ReflectionUtil {
         }
         // TODO: SecurityManager-based version?
         // slower fallback method using stack trace
-        final StackTraceElement element = getEquivalentStackTraceElement(depth + 1);
+        final StackTraceElement element = getEquivalentSte(depth + 1);
         try {
             return LoaderUtil.loadClass(element.getClassName());
         } catch (final ClassNotFoundException e) {
@@ -105,7 +105,7 @@ public class ReflectionUtil {
         return null;
     }
 
-    public static StackTraceElement getEquivalentStackTraceElement(final int depth) {
+    public static StackTraceElement getEquivalentSte(final int depth) {
         // (MS) I tested the difference between using Throwable.getStackTrace() and Thread.getStackTrace(), and
         // the version using Throwable was surprisingly faster! at least on Java 1.8. See ReflectionBenchmark.
         final StackTraceElement[] elements = new Throwable().getStackTrace();
