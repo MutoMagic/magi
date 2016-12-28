@@ -6,10 +6,9 @@ Note: At present, there is no test on Linux, may be some problems.
 
 ## Building
 
-1.Add the JAVA6_HOME and JAVA8_HOME environment variables.
-See [gradle-retrolambda](https://github.com/evant/gradle-retrolambda)
+1.Add JAVA6_HOME and JAVA8_HOME environment variables. See [gradle-retrolambda](https://github.com/evant/gradle-retrolambda)
 
-2.Add the [Lombok](https://projectlombok.org/) plugin in your IDE.
+2.Add [Lombok](https://projectlombok.org/) plugin in your IDE.
 
 3.Running the project.
 
