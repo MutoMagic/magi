@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 设置 status=DEBUG 查看log4j的装配过程 -->
-<Configuration status="DEBUG">
+<Configuration status="TRACE">
     <Properties>
         <Property name="LOG_HOME">.csga/logs</Property>
         <!-- 日志备份目录 -->
@@ -17,15 +17,19 @@
 
         <!-- 开发者日志 -->
         <RollingFile name="dev" fileName="${LOG_HOME}/last.log" immediateFlush="false"
-                     filePattern="${BACKUP_HOME}/$${date:yyyy-MM}/%d{yyyyMMdd}-%i.log.gz">
+                     filePattern="${BACKUP_HOME}/%d{yyyyMMdd}-%i.log.gz">
             <ThresholdFilter level="INFO" onMatch="ACCEPT"/>
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
                 <OnStartupTriggeringPolicy/>
-                <SizeBasedTriggeringPolicy size="170MB"/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
                 <TimeBasedTriggeringPolicy modulate="true"/>
             </Policies>
-            <DefaultRolloverStrategy max="5"/>
+            <DefaultRolloverStrategy max="10">
+                <Delete basePath="${BACKUP_HOME}">
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
         </RollingFile>
     </Appenders>
 

@@ -18,22 +18,22 @@ public class MagiGame extends ApplicationAdapter {
 
     @Override
     public void create() {
-        String name = FF.OSZ_420265.name();
+        String name = FF.OSZ_404910.name();
         String base = FilenameUtils.getBaseName(name);
         FileHandle dir = FF.SONGS.child(base);
         Log.i("音频路径 %s", dir.path());
         if (!dir.exists()) {
-            FF.OSZ_420265.copyTo(FF.SONGS.child(name));
+            FF.OSZ_404910.copyTo(FF.SONGS.child(name));
             ZipPackage.unpack(FF.SONGS.child(name).file(), dir.file());
             FF.SONGS.child(name).delete();
         }
-        Controller c = new Controller(base + "/15_Feb_2016.mp3", 175, 687, 44);
+        Controller c = new Controller(base + "/Sana - Packet Hero.mp3", 236, 396, 44);
 //        c.play(1.5f, true);
-        c.play(65879);
+        c.play(64400);
 
         batch = new SpriteBatch();
 //        img = new Texture("badlogic.jpg");
-        img = new Texture(dir.child("suwako_2_00000.jpg"));
+        img = new Texture(dir.child("PacketBG.jpg"));
     }
 
     @Override

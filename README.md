@@ -19,7 +19,7 @@ Note: At present, there is no test on Linux, may be some problems.
     Open the Run/Debug Configurations, add Application and set
     
     >Main class = com.moebuff.magi.desktop.DesktopLauncher  
-    Working Directory = magi\android\assets
+    Working Directory = android/assets
 
     Save and run.
 
