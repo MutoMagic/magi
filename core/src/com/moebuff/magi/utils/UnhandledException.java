@@ -1,5 +1,7 @@
 package com.moebuff.magi.utils;
 
+import org.slf4j.helpers.FormattingTuple;
+
 /**
  * 包装那些 已/未处理 的异常，并将它们扔出去。这些异常应在开发过程中被解决，或在运行时无效，后者通常用来记录日志。
  * 对于那些工具类来说，大多数的异常是方便开发者 {@code debug} 而使用的，建议将其包装，并在程序中杜绝。
@@ -38,19 +40,11 @@ public class UnhandledException extends RuntimeException {
      * @return 新创建的异常对象
      */
     public static RuntimeException format(String message, Object... values) {
-        return new UnhandledException(Log.formatMessage(message, values));
-    }
-
-    /**
-     * 使用 {@link Log#formatMessage(String, Object...)} 对 message 进行格式化，并用指定的原因构造一个新的异常。
-     *
-     * @param message 包含错误信息的格式字符串
-     * @param cause   需要保留的原因
-     * @param values  格式字符串中由格式说明符引用的参数。参数的数目是可变的，可为 0。
-     * @return 新创建的异常对象
-     */
-    public static RuntimeException format(String message, Throwable cause, Object... values) {
-        return new UnhandledException(Log.formatMessage(message, values), cause);
+        FormattingTuple tuple = Log.formatMessage(message, values);
+        if (tuple.getThrowable() != null) {
+            return new UnhandledException(tuple.getMessage(), tuple.getThrowable());
+        }
+        return new UnhandledException(tuple.getMessage());
     }
 
     /**
@@ -62,17 +56,5 @@ public class UnhandledException extends RuntimeException {
      */
     public static void validate(boolean expression, String message, Object... values) {
         if (!expression) throw format(message, values);
-    }
-
-    /**
-     * 验证表达式，若表达式不成立则抛出异常。抛出的异常由指定的原因和格式化后的 message 创建。
-     *
-     * @param expression 表达式
-     * @param message    包含错误信息的格式字符串
-     * @param cause      需要保留的原因
-     * @param values     格式字符串中由格式说明符引用的参数。参数的数目是可变的，可为 0。
-     */
-    public static void validate(boolean expression, String message, Throwable cause, Object... values) {
-        if (!expression) throw format(message, cause, values);
     }
 }

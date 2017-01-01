@@ -147,7 +147,7 @@ public class OS {
                 setLoaded(libraryName);
             } catch (Throwable ex) {
                 throw UnhandledException.format("Couldn't load shared library '%s' for target: %s, %s",
-                        ex, platformName, name, is64Bit ? "64-bit" : "32-bit");
+                        platformName, name, is64Bit ? "64-bit" : "32-bit", ex);
             }
         }
     }
@@ -172,7 +172,7 @@ public class OS {
             file = File.createTempFile(sourceCrc, null);//用于判断文件能否被创建
             if (file.delete() && loadFile(sourcePath, sourceCrc, file) == null) return;
         } catch (Throwable ignored) {
-            Log.d(ignored.getMessage());
+            Log.getLogger().debug(ignored.getMessage());
         }
 
         // User home.
@@ -208,7 +208,7 @@ public class OS {
             UnhandledException.validate(entry != null, "Couldn't find '%s' in JAR: %s", path, nativesJar);
             return file.getInputStream(entry);
         } catch (IOException ex) {
-            throw UnhandledException.format("Error reading '%s' in JAR: %s", ex, path, nativesJar);
+            throw UnhandledException.format("Error reading '%s' in JAR: %s", path, nativesJar, ex);
         }
     }
 
@@ -247,7 +247,7 @@ public class OS {
                 output.close();
             } catch (IOException ex) {
                 throw UnhandledException.format("Error extracting file: %s\nTo: %s",
-                        ex, sourcePath, extractedFile.getAbsolutePath());
+                        sourcePath, extractedFile.getAbsolutePath(), ex);
             }
         }
         return extractedFile;

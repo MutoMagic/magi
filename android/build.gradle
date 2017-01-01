@@ -41,6 +41,22 @@ android {
         ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:<dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~' +
                 ':.csga:badlogic.jpg'
     }
+
+    buildTypes {
+        debug {
+            buildConfigField "String", "LOG_LEVEL", '"TRACE"'
+            buildConfigField "int", "LOG_SIZE", "20"
+            buildConfigField "String", "LOG_FILENAME", '"debug.log"'
+            buildConfigField "boolean", "LOG_APPEND", "true"
+        }
+
+        release {
+            buildConfigField "String", "LOG_LEVEL", '"INFO"'
+            buildConfigField "int", "LOG_SIZE", "5"
+            buildConfigField "String", "LOG_FILENAME", '"release.log"'
+            buildConfigField "boolean", "LOG_APPEND", "false"
+        }
+    }
 }
 
 // called every time gradle gets executed, takes the native dependencies of

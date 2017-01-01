@@ -8,6 +8,8 @@ import com.moebuff.magi.reflect.ReflectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
+import org.slf4j.helpers.FormattingTuple;
+import org.slf4j.helpers.MessageFormatter;
 
 /**
  * 为了让log更加便捷、快速，好的我编不下去了...
@@ -15,7 +17,7 @@ import org.slf4j.event.Level;
  * <p>
  * 因此本类存在的意义就是让log持久化，至于保存在哪里（本地还是网络），请参考相应的配置文件。
  * 以下均采用 slf4j 作为 api，至于实现嘛，请自行谷歌。需要注意的就是 log4j 不能在 Android 中使用。
- * 对于原先自带的log，我也做了简单的封装，现在能自动生成tag，但并不支持持久化，那些方法不推荐使用。
+ * 对于原先自带的log，我也做了简单的封装，现在能自动生成tag，但并不支持持久化，这些方法不推荐使用。
  * <p>
  * 理解正确的日志输出级别。很多程序员都忽略了日志输出级别，甚至不知道如何指定日志的输出级别。
  * 对于日志输出级别来说, 下面是我们应该记住的一些原则:
@@ -35,58 +37,6 @@ import org.slf4j.event.Level;
  * @author muto
  */
 public final class Log {
-    public static void t(String m, Object... args) {
-        getLogger().trace(formatMessage(m, args));
-    }
-
-    public static void t(String m, Throwable e, Object... args) {
-        getLogger().trace(formatMessage(m, args), e);
-    }
-
-    public static void d(String m, Object... args) {
-        getLogger().debug(formatMessage(m, args));
-    }
-
-    public static void d(String m, Throwable e, Object... args) {
-        getLogger().debug(formatMessage(m, args), e);
-    }
-
-    public static void i(String m, Object... args) {
-        getLogger().info(formatMessage(m, args));
-    }
-
-    public static void i(String m, Throwable e, Object... args) {
-        getLogger().info(formatMessage(m, args), e);
-    }
-
-    public static void w(String m, Object... args) {
-        getLogger().warn(formatMessage(m, args));
-    }
-
-    public static void w(String m, Throwable e, Object... args) {
-        getLogger().warn(formatMessage(m, args), e);
-    }
-
-    public static void e(String m, Object... args) {
-        getLogger().error(formatMessage(m, args));
-    }
-
-    public static void e(String m, Throwable e, Object... args) {
-        getLogger().error(formatMessage(m, args), e);
-    }
-
-    private static Logger getLogger() {
-        Class<?> callerClass = ReflectionUtil.getCallerClass(3);
-        UnhandledException.validate(callerClass != null, "无法获取上级类");
-        return LoggerFactory.getLogger(callerClass);
-    }
-
-    public static String formatMessage(String m, Object... args) {
-        return String.format(m, args);
-    }
-
-    //---------------------------------------------------------------------------------------------
-
     private static ApplicationLogger logger;
 
     private static final String LWJGL_GDX_LOGGER_PKG = "com.moebuff.magi.desktop.LwjglGdxLogger";
@@ -105,42 +55,61 @@ public final class Log {
     }
 
     public static void trace(String m, Object... args) {
-        logger.trace(logger.getTag(Level.TRACE, 2), formatMessage(m, args));
-    }
-
-    public static void trace(String m, Throwable e, Object... args) {
-        logger.trace(logger.getTag(Level.TRACE, 2), formatMessage(m, args), e);
+        String tag = logger.getTag(Level.TRACE, 2);
+        FormattingTuple tuple = formatMessage(m, args);
+        if (tuple.getThrowable() != null) {
+            logger.trace(tag, tuple.getMessage(), tuple.getThrowable());
+            return;
+        }
+        logger.trace(tag, tuple.getMessage());
     }
 
     public static void debug(String m, Object... args) {
-        Gdx.app.debug(logger.getTag(Level.DEBUG, 2), formatMessage(m, args));
-    }
-
-    public static void debug(String m, Throwable e, Object... args) {
-        Gdx.app.debug(logger.getTag(Level.DEBUG, 2), formatMessage(m, args), e);
+        String tag = logger.getTag(Level.DEBUG, 2);
+        FormattingTuple tuple = formatMessage(m, args);
+        if (tuple.getThrowable() != null) {
+            Gdx.app.debug(tag, tuple.getMessage(), tuple.getThrowable());
+            return;
+        }
+        Gdx.app.debug(tag, tuple.getMessage());
     }
 
     public static void info(String m, Object... args) {
-        Gdx.app.log(logger.getTag(Level.INFO, 2), formatMessage(m, args));
-    }
-
-    public static void info(String m, Throwable e, Object... args) {
-        Gdx.app.log(logger.getTag(Level.INFO, 2), formatMessage(m, args), e);
+        String tag = logger.getTag(Level.INFO, 2);
+        FormattingTuple tuple = formatMessage(m, args);
+        if (tuple.getThrowable() != null) {
+            Gdx.app.log(tag, tuple.getMessage(), tuple.getThrowable());
+            return;
+        }
+        Gdx.app.log(tag, tuple.getMessage());
     }
 
     public static void warn(String m, Object... args) {
-        logger.warn(logger.getTag(Level.WARN, 2), formatMessage(m, args));
-    }
-
-    public static void warn(String m, Throwable e, Object... args) {
-        logger.warn(logger.getTag(Level.WARN, 2), formatMessage(m, args), e);
+        String tag = logger.getTag(Level.WARN, 2);
+        FormattingTuple tuple = formatMessage(m, args);
+        if (tuple.getThrowable() != null) {
+            logger.warn(tag, tuple.getMessage(), tuple.getThrowable());
+            return;
+        }
+        logger.warn(tag, tuple.getMessage());
     }
 
     public static void error(String m, Object... args) {
-        Gdx.app.error(logger.getTag(Level.ERROR, 2), formatMessage(m, args));
+        String tag = logger.getTag(Level.ERROR, 2);
+        FormattingTuple tuple = formatMessage(m, args);
+        if (tuple.getThrowable() != null) {
+            Gdx.app.error(tag, tuple.getMessage(), tuple.getThrowable());
+            return;
+        }
+        Gdx.app.error(tag, tuple.getMessage());
     }
 
-    public static void error(String m, Throwable e, Object... args) {
-        Gdx.app.error(logger.getTag(Level.ERROR, 2), formatMessage(m, args), e);
+    public static FormattingTuple formatMessage(String m, Object... args) {
+        return MessageFormatter.arrayFormat(String.format(m, args), args);
+    }
+
+    public static Logger getLogger() {
+        Class<?> caller = ReflectionUtil.getCallerClass(2);
+        return LoggerFactory.getLogger(caller == null ? Log.class : caller);
     }
 }

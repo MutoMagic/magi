@@ -83,7 +83,7 @@ public class LwjglGdxHandle extends FileHandle implements MethodInterceptor, Pro
             dest.write(source.read(), false);
         } catch (Exception ex) {
             throw UnhandledException.format("Error copying source file: %s (%s)\nTo destination: %s (%s)",
-                    ex, source.file(), source.type(), dest.file(), dest.type());
+                    source.file(), source.type(), dest.file(), dest.type(), ex);
         }
     }
 
@@ -115,7 +115,7 @@ public class LwjglGdxHandle extends FileHandle implements MethodInterceptor, Pro
     @Override
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
         boolean isOverride = method.getDeclaringClass() == LwjglGdxHandle.class;
-        Log.t("invokeSuper=%-5b %s", isOverride, method);
+        Log.getLogger().debug("invokeSuper=%-5b %s", isOverride, method);
         if (isOverride) {
             return proxy.invokeSuper(obj, args);
         }

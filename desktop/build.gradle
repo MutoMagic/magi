@@ -2,7 +2,10 @@ apply plugin: "java"
 
 sourceCompatibility = 1.8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-sourceSets.main.java.srcDirs = ["src/"]
+sourceSets.main {
+    java.srcDirs = ["src/"]
+    resources.srcDirs = ["res/"]
+}
 
 project.ext.mainClassName = "com.moebuff.magi.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../android/assets")

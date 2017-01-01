@@ -6,7 +6,7 @@
         <!-- 日志备份目录 -->
         <property name="BACKUP_HOME">${LOG_HOME}/backup</property>
         <Property name="LOG_PATTERN">
-            %d{yyyy-MM-dd HH:mm:ss.SSS} %tp-%T/%t %p{length=1}/%c: %m%n
+            %d{yyyy-MM-dd HH:mm:ss.SSS} %tp-%T/%t %p{length=1}/%l: %m%n
         </Property>
     </Properties>
 

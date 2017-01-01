@@ -48,7 +48,7 @@ public class ReflectionUtil {
             Object o = getCallerClass.invoke(null, 0);
             final Object test1 = getCallerClass.invoke(null, 0);
             if (o == null || o != sunReflectionClass) {
-                Log.warn("Unexpected return value from Reflection.getCallerClass(): %s", test1);
+                Log.warn("Unexpected return value from Reflection.getCallerClass(): {}", test1);
                 getCallerClass = null;
                 java7u25CompensationOffset = -1;
             } else {
@@ -88,7 +88,7 @@ public class ReflectionUtil {
                 return (Class<?>) GET_CALLER_CLASS.invoke(null, depth + 1 + JDK_7u25_OFFSET);
             } catch (final Exception e) {
                 // theoretically this could happen if the caller class were native code
-                Log.error("Error in ReflectionUtil.getCallerClass(%s).", e, depth);
+                Log.error("Error in ReflectionUtil.getCallerClass({}).", depth, e);
                 // TODO: return Object.class
                 return null;
             }
@@ -99,7 +99,7 @@ public class ReflectionUtil {
         try {
             return LoaderUtil.loadClass(element.getClassName());
         } catch (final ClassNotFoundException e) {
-            Log.error("Could not find class in ReflectionUtil.getCallerClass(%s).", e, depth);
+            Log.error("Could not find class in ReflectionUtil.getCallerClass({}).", depth, e);
         }
         // TODO: return Object.class
         return null;
@@ -118,7 +118,7 @@ public class ReflectionUtil {
                 ++i;
             }
         }
-        Log.error("Could not find an appropriate StackTraceElement at index %s", depth);
+        Log.error("Could not find an appropriate StackTraceElement at index {}", depth);
         throw new IndexOutOfBoundsException(Integer.toString(depth));
     }
 

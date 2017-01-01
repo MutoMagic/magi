@@ -8,10 +8,14 @@ import org.slf4j.event.Level;
 public class LwjglGdxLogger implements ApplicationLogger {
     private static final String LOG4J_ASYNC_CONTEXT_SELECTOR
             = "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector";
+    private static final String LOG4J_FORMAT_MESSAGE_FACTORY
+            = "org.apache.logging.log4j.message.FormattedMessageFactory";
+
     private float logLevel = LOG_INFO;
 
     static {
         System.setProperty("Log4jContextSelector", LOG4J_ASYNC_CONTEXT_SELECTOR);
+        System.setProperty("log4j2.messageFactory", LOG4J_FORMAT_MESSAGE_FACTORY);
     }
 
     @Override
