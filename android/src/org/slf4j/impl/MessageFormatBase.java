@@ -17,7 +17,7 @@ import static org.slf4j.spi.LocationAwareLogger.*;
 public abstract class MessageFormatBase extends MarkerIgnoringBase {
 
     /**
-     * 忽略只有一个参数的方法，基于其 {@link Throwable} 为null的实现。
+     * 忽略只有一个参数的方法，基于 {@link Throwable} 为null的实现。
      */
     public static abstract class IgnoreOnlyMessage extends MessageFormatBase {
         @Override

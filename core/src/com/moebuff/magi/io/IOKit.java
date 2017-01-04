@@ -68,7 +68,16 @@ public class IOKit {
         }
     }
 
+    /**
+     * 往输出流中写入一条字符串，并在写入后换行。
+     *
+     * @param data   需要写入的字符串，为 null 则忽略
+     * @param output 被写入的输出流对象
+     * @throws NullPointerException 如果 output 为 null
+     * @throws UnhandledException   如果发生 I/O 错误
+     */
     public static void writeln(final String data, final OutputStream output) {
+        if (data == null) return;
         int size = data.length() + IOUtils.LINE_SEPARATOR.length();
         ByteArrayOutputStream byteArray = new ByteArrayOutputStream(size);
         try {
