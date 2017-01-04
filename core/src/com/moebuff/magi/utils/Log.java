@@ -39,7 +39,7 @@ import java.util.Map;
  *
  * @author muto
  */
-public final class Log {
+public class Log {
     private static final Map<Class, Logger> LOGGER_MAP = new HashMap<>();
     private static final String LWJGL_GDX_LOGGER_PKG = "com.moebuff.magi.desktop.LwjglGdxLogger";
     private static final String ANDROID_GDX_LOGGER_PKG = "com.moebuff.magi.AndroidGdxLogger";
