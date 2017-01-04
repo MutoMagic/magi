@@ -1,7 +1,7 @@
 package org.slf4j.impl;
 
-import android.os.Environment;
 import android.util.Log;
+import com.moebuff.magi.io.FF;
 import com.moebuff.magi.io.FileKit;
 import com.moebuff.magi.io.IOKit;
 import com.moebuff.magi.utils.OS;
@@ -44,8 +44,7 @@ public class AndroidLogAdapter implements LogAdapter {
 
     //---------------------------------------------------------------------------------------------
 
-    private static final File LOG_FILE = FileKit.getFile("%s/magi!csga/last.log",
-            Environment.getExternalStorageDirectory().getAbsolutePath());
+    private static final File LOG_FILE = FF.ROOT.child("last.log").file();
     private static final OutputStream LOG_STREAM = FileKit.openOutputStream(LOG_FILE, false);
 
     private void log(int level, String tag, String message) {
