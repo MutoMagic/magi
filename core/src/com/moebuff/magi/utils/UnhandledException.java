@@ -36,7 +36,8 @@ public class UnhandledException extends RuntimeException {
      * 使用 {@link Log#formatMessage(String, Object...)} 对 message 进行格式化，并创建一个新的异常。
      *
      * @param message 包含错误信息的格式字符串
-     * @param values  格式字符串中由格式说明符引用的参数。参数的数目是可变的，可为 0。
+     * @param values  格式字符串中由格式说明符引用的参数。参数的数目是可变的，可以为 0。
+     *                通常将最后一个设置为 {@link Throwable cause}，如果有的话。
      * @return 新创建的异常对象
      */
     public static RuntimeException format(String message, Object... values) {
@@ -52,7 +53,8 @@ public class UnhandledException extends RuntimeException {
      *
      * @param expression 表达式
      * @param message    包含错误信息的格式字符串
-     * @param values     格式字符串中由格式说明符引用的参数。参数的数目是可变的，可为 0。
+     * @param values     格式字符串中由格式说明符引用的参数。参数的数目是可变的，可以为 0。
+     *                   通常将最后一个设置为 {@link Throwable cause}，如果有的话。
      */
     public static void validate(boolean expression, String message, Object... values) {
         if (!expression) throw format(message, values);

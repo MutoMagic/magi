@@ -1,6 +1,8 @@
 package org.slf4j.impl;
 
+import com.moebuff.magi.BuildConfig;
 import com.moebuff.magi.utils.Log;
+import org.slf4j.event.Level;
 import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MarkerIgnoringBase;
 
@@ -46,7 +48,7 @@ public abstract class MessageFormatBase extends MarkerIgnoringBase {
 
     //---------------------------------------------------------------------------------------------
 
-    private int logLevel = LogConfigurator.LOG_LEVEL.toInt();
+    private int logLevel = Level.valueOf(BuildConfig.LOG_LEVEL).toInt();
 
     @Override
     public boolean isTraceEnabled() {

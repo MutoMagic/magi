@@ -15,14 +15,14 @@ import java.lang.reflect.Field;
  * @author muto
  */
 public class FF {
-    public static final FileHandle ROOT;
-
     public static FileHandle CACHE;
     public static FileHandle SONGS;
     public static FileHandle SKIN;
 
     private static final String LWJGL_GDX_HANDLE_PKG = "com.moebuff.magi.desktop.LwjglGdxHandle";
     private static final String ANDROID_GDX_HANDLE_PKG = "com.moebuff.magi.AndroidGdxHandle";
+
+    public static final FileHandle ROOT;//根目录
 
     static {
         Class<Catalog> gdxHandleClass;
@@ -31,7 +31,7 @@ public class FF {
         } catch (ClassNotFoundException ignored) {
             gdxHandleClass = LoaderUtil.loadClass(ANDROID_GDX_HANDLE_PKG, true);
         }
-        final Catalog dir = ClassKit.newInstance(gdxHandleClass);
+        Catalog dir = ClassKit.newInstance(gdxHandleClass);
         ROOT = dir.getRoot();
         ASSETS = dir.getAssets();
 

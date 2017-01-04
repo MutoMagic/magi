@@ -18,18 +18,15 @@ public class I18N {
 
     //==========================================================================================
 
-    private static Class<I18N> ic = I18N.class;
-    private static String baseName = ic.getSimpleName().toLowerCase();
-    private static Field[] fields = ic.getFields();
-
     /**
      * 加载指定地区的语言环境
      *
      * @param locale 特定的地理、政治和文化地区
      */
     public static void load(Locale locale) {
+        String baseName = I18N.class.getSimpleName().toLowerCase();
         ResourceBundle bundle = ResourceBundle.getBundle(baseName, locale);
-        for (Field f : fields) {
+        for (Field f : I18N.class.getFields()) {
             String key = f.getName();
             if (bundle.containsKey(key)) {
                 FieldKit.writeStaticField(f, bundle.getString(key));

@@ -14,7 +14,10 @@ public class LwjglGdxLogger implements ApplicationLogger {
     private float logLevel = LOG_INFO;
 
     static {
+        // Making All Loggers Asynchronous
         System.setProperty("Log4jContextSelector", LOG4J_ASYNC_CONTEXT_SELECTOR);
+
+        // Support StringFormattedMessage and ParameterizedMessage
         System.setProperty("log4j2.messageFactory", LOG4J_FORMAT_MESSAGE_FACTORY);
     }
 
