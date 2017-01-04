@@ -7,7 +7,7 @@ import com.moebuff.magi.io.Catalog;
 public class AndroidGdxHandle implements Catalog {
     @Override
     public FileHandle getRoot() {
-        return Gdx.files.external("magi!caga");
+        return Gdx.files.external("magi!csga");
     }
 
     @Override

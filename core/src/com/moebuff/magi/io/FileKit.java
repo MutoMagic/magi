@@ -5,10 +5,7 @@ import com.moebuff.magi.utils.UnhandledException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -173,15 +170,44 @@ public class FileKit {
      * An exception is thrown if the file object exists but is a directory.
      * An exception is thrown if the file exists but cannot be read.
      *
-     * @param f the file to open for input, must not be {@code null}
+     * @param file the file to open for input, must not be {@code null}
      * @return a new {@link FileInputStream} for the specified file
      * @throws UnhandledException if the file does not exist
      * @throws UnhandledException if the file object is a directory
      * @throws UnhandledException if the file cannot be read
      */
-    public static InputStream openInputStream(File f) {
+    public static FileInputStream openInputStream(final File file) {
         try {
-            return FileUtils.openInputStream(f);
+            return FileUtils.openInputStream(file);
+        } catch (IOException e) {
+            throw new UnhandledException(e);
+        }
+    }
+
+    /**
+     * Opens a {@link FileOutputStream} for the specified file, checking and
+     * creating the parent directory if it does not exist.
+     * <p>
+     * At the end of the method either the stream will be successfully opened,
+     * or an exception will have been thrown.
+     * <p>
+     * The parent directory will be created if it does not exist.
+     * The file will be created if it does not exist.
+     * An exception is thrown if the file object exists but is a directory.
+     * An exception is thrown if the file exists but cannot be written to.
+     * An exception is thrown if the parent directory cannot be created.
+     *
+     * @param file   the file to open for output, must not be {@code null}
+     * @param append if {@code true}, then bytes will be added to the
+     *               end of the file rather than overwriting
+     * @return a new {@link FileOutputStream} for the specified file
+     * @throws UnhandledException if the file object is a directory
+     * @throws UnhandledException if the file cannot be written to
+     * @throws UnhandledException if a parent directory needs creating but that fails
+     */
+    public static FileOutputStream openOutputStream(final File file, final boolean append) {
+        try {
+            return FileUtils.openOutputStream(file, append);
         } catch (IOException e) {
             throw new UnhandledException(e);
         }

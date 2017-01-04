@@ -9,17 +9,17 @@ import org.slf4j.helpers.MarkerIgnoringBase;
 import static org.slf4j.spi.LocationAwareLogger.*;
 
 /**
- * 由于 format 方法很少使用，本来想模仿 {@link MarkerIgnoringBase} 直接忽略，
- * 然而 SLF4J 有个类已实现该转换，既然官方有了，那就直接拿来用了。
+ * This class serves as base for adapters or native implementations of
+ * logging systems lacking format support.
  *
  * @author muto
  */
 public abstract class MessageFormatBase extends MarkerIgnoringBase {
 
     /**
-     * 忽略只有一个参数的方法，基于其对应的 {@link Throwable} 为null的实现。
+     * 忽略只有一个参数的方法，基于其 {@link Throwable} 为null的实现。
      */
-    public abstract static class IgnoreOnlyMessage extends MessageFormatBase {
+    public static abstract class IgnoreOnlyMessage extends MessageFormatBase {
         @Override
         public void trace(String msg) {
             trace(msg, (Throwable) null);

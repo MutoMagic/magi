@@ -2,7 +2,6 @@ package com.moebuff.magi.io;
 
 import com.moebuff.magi.utils.OS;
 import com.moebuff.magi.utils.UnhandledException;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 
 import java.io.*;
@@ -30,7 +29,7 @@ public class ZipPackage extends File {
     public static void unpack(File source, File dest) {
         ZipFile file = getFile(source);
         unpack(file, dest);
-        IOUtils.closeQuietly(file);
+        IOKit.closeQuietly(file);
     }
 
     private static void unpack(ZipFile source, File dest) {
