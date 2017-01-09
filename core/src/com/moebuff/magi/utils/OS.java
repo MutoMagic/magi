@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.zip.ZipEntry;
@@ -69,6 +70,47 @@ public class OS {
         }
     }
 
+    /**
+     * 从指定源数组中复制一个数组，复制从指定的位置开始，到目标数组的指定位置结束，支持类型转换。
+     *
+     * @param src     源数组
+     * @param srcPos  源数组中的起始位置
+     * @param dest    目标数组
+     * @param destPos 目标数据中的起始位置
+     * @param length  要复制的数组元素的数量
+     * @throws NullPointerException      如果 src 或 dest 为 null
+     * @throws ArrayStoreException       如果 src 或 dest 是非数组对象
+     * @throws IndexOutOfBoundsException 如果复制会导致对数组范围以外的数据的访问
+     * @see System#arraycopy(Object, int, Object, int, int)
+     */
+    public static void arraycopy(Object src, int srcPos, Object dest, int destPos, int length) {
+        Validate.notNull(src, "参数 src 不能为 null");
+        Validate.notNull(dest, "参数 dest 不能为 null");
+        Class type = dest.getClass();
+        if (!src.getClass().isArray() || !type.isArray()) {
+            throw new ArrayStoreException("参数 src 和 dest 必须为数组对象");
+        }
+        if (srcPos < 0 || destPos < 0 || length < 0
+                || srcPos + length > Array.getLength(src)
+                || destPos + length > Array.getLength(dest)
+                ) {
+            throw new IndexOutOfBoundsException("数组访问越界");
+        }
+
+        // 类型兼容
+        if (type.isInstance(src)) {
+            System.arraycopy(src, srcPos, dest, destPos, length);
+            return;
+        }
+
+        type = type.getComponentType();
+        for (int i = srcPos, j = destPos; i < length; i++) {
+            Object value = Array.get(src, i);
+            value = TypeConverter.parse(value, type);
+            Array.set(dest, j++, value);
+        }
+    }
+
     public static String currentDateTime() {
         return DEFAULT_DATETIME_FORMAT.format(System.currentTimeMillis());
     }
@@ -85,6 +127,7 @@ public class OS {
      */
     public static String getProjectName(Package p, int depth) {
         Validate.isTrue(p != null, "Package不能为null");
+
         String name = p.getName();
         if (name.contains(".")) {
             String[] pkg = name.split("\\.");

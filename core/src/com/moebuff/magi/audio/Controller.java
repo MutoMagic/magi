@@ -45,7 +45,7 @@ public class Controller {
     public void play(float rate, boolean tone) {
         String name = String.format("%s_%s_%b.%s",
                 FCIV.md5Hex(song.file()),
-                Operation.toHex(rate),
+                Operation.toHexString(rate),
                 tone,
                 FilenameUtils.getExtension(path)
         );

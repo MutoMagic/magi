@@ -10,6 +10,8 @@ import org.apache.commons.lang3.StringUtils;
  * @see StringUtils
  */
 public class StringKit {
+    public static final String NULL_STRING = "null";
+
     /**
      * 首字母大写
      */
