@@ -16,7 +16,7 @@ import java.util.Map;
 
 /**
  * 为了让log更加便捷、快速，好的我编不下去了...
- * 这个gdx自带的log是什么鬼，为什么没有持久化，Are you fucking killing me ?!
+ * 这个自带的log是什么鬼，为什么没有持久化，Are you fucking killing me ?!
  * <p>
  * 因此本类存在的意义就是让log持久化，保存在哪里（本地还是网络），请参考相应的配置文件。
  * 以下均采用 slf4j 作为 api，至于实现嘛，请自行谷歌。需要注意的就是 log4j 不能在 Android 中使用。
