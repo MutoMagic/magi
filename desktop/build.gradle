@@ -25,6 +25,7 @@ task dist(type: Jar) {
     from files(project.assetsDir) {
         exclude '.csga', 'badlogic.jpg'
     }
+    exclude 'log4j2-test.xml'
 
     manifest {
         attributes 'Main-Class': project.mainClassName
