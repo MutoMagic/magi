@@ -90,6 +90,7 @@ public class Log {
         return MessageFormatter.arrayFormat(String.format(m, args), args);
     }
 
+    @Deprecated
     public static void trace(String m, Object... args) {
         String tag = logger.getTag(Level.TRACE, 2);
         FormattingTuple tuple = formatMessage(m, args);
@@ -100,6 +101,7 @@ public class Log {
         logger.trace(tag, tuple.getMessage());
     }
 
+    @Deprecated
     public static void debug(String m, Object... args) {
         String tag = logger.getTag(Level.DEBUG, 2);
         FormattingTuple tuple = formatMessage(m, args);
@@ -110,6 +112,7 @@ public class Log {
         Gdx.app.debug(tag, tuple.getMessage());
     }
 
+    @Deprecated
     public static void info(String m, Object... args) {
         String tag = logger.getTag(Level.INFO, 2);
         FormattingTuple tuple = formatMessage(m, args);
@@ -120,6 +123,7 @@ public class Log {
         Gdx.app.log(tag, tuple.getMessage());
     }
 
+    @Deprecated
     public static void warn(String m, Object... args) {
         String tag = logger.getTag(Level.WARN, 2);
         FormattingTuple tuple = formatMessage(m, args);
@@ -130,6 +134,7 @@ public class Log {
         logger.warn(tag, tuple.getMessage());
     }
 
+    @Deprecated
     public static void error(String m, Object... args) {
         String tag = logger.getTag(Level.ERROR, 2);
         FormattingTuple tuple = formatMessage(m, args);
