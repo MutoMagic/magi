@@ -1,10 +1,19 @@
 package com.moebuff.magi.reflect;
 
+import com.moebuff.magi.utils.URLUtils;
 import com.moebuff.magi.utils.UnhandledException;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * 类型工具
@@ -39,5 +48,87 @@ public class ClassKit {
         Class<?>[] parameterTypes = ClassUtils.toClass(args);
         Constructor<T> ctor = ConstructorKit.getConstructor(c, parameterTypes);
         return ConstructorKit.newInstance(ctor, args);
+    }
+
+    public static Class[] getClasses(String pkg) {
+        return getClasses(pkg, false);
+    }
+
+    /**
+     * 获取指定包下的类集合。若要深入子包请将 deep 设置为 true
+     *
+     * @param pkg  包名
+     * @param deep 为true，允许递归子包
+     * @return 指定包下的类集合
+     */
+    public static Class[] getClasses(String pkg, boolean deep) {
+        Set<Class> classes = new HashSet<>();
+        ClassLoader loader = LoaderUtil.getThreadContextClassLoader();
+
+        URL url = loader.getResource(pkg.replace(".", "/"));
+        if (url != null) {
+            String protocol = url.getProtocol();
+
+            if ("file".equals(protocol)) {
+                classes = getClasses(url.getPath(), pkg, deep);
+            } else if ("jar".equals(protocol)) {
+                classes = getClasses(URLUtils.getJarFile(url), pkg, deep);
+            }
+        }
+        return classes.toArray(new Class[classes.size()]);
+    }
+
+    private static Set<Class> getClasses(String path, final String pkg, final boolean deep) {
+        final Set<Class> classes = new HashSet<>();
+        File[] list = new File(path).listFiles(pathname -> {
+            boolean isDir = pathname.isDirectory();
+
+            if (isDir && deep) {
+                Set<Class> child = getClasses(pathname.getPath(), pkg, true);
+                classes.addAll(child);
+            }
+            return !isDir;
+        });
+
+        if (list != null) {
+            String name;
+            Class clazz;
+            for (File f : list) {
+                name = f.getName();
+                if (!name.endsWith(".class") || name.contains("$")) {
+                    continue;//排除非法的类文件
+                }
+
+                name = FilenameUtils.getBaseName(name);
+                name = String.format("%s.%s", pkg, name);
+                clazz = LoaderUtil.loadClass(name, true);
+                classes.add(clazz);
+            }
+        }
+        return classes;
+    }
+
+    private static Set<Class> getClasses(JarFile file, String pkg, boolean deep) {
+        Set<Class> classes = new HashSet<>();
+        Enumeration<JarEntry> enumeration = file.entries();
+        while (enumeration.hasMoreElements()) {
+            JarEntry entry = enumeration.nextElement();
+            if (entry.isDirectory()) continue;
+
+            String name = entry.getName();
+            String path = FilenameUtils.getPathNoEndSeparator(name).replace("/", ".");
+            name = FilenameUtils.getName(name);
+            if (!name.endsWith(".class") || name.contains("$")
+                    || !path.startsWith(pkg)) {
+                continue;
+            }
+            if (deep || path.replace(pkg, "").isEmpty()) {
+                name = FilenameUtils.getBaseName(name);
+                name = String.format("%s.%s", pkg, name);
+                Class clazz = LoaderUtil.loadClass(name, true);
+                classes.add(clazz);
+            }
+        }
+        return classes;
     }
 }

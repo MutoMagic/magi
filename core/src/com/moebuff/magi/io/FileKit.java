@@ -6,9 +6,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 /**
  * 文件工具
@@ -19,24 +16,6 @@ import java.net.URL;
  */
 public class FileKit {
     public static final File WKINGDIR = new File("").getAbsoluteFile();
-
-    /**
-     * 将 URL 转换成 URI
-     */
-    public static URI toURI(URL url) {
-        try {
-            return url.toURI();
-        } catch (URISyntaxException e) {
-            throw new UnhandledException(e);
-        }
-    }
-
-    /**
-     * 用 url 创建一个 file 对象
-     */
-    public static File toFile(URL url) {
-        return new File(toURI(url));
-    }
 
     /**
      * 获取内部资源，该资源位于 working directory 中；若运行的是jar，则从jar中获取。
