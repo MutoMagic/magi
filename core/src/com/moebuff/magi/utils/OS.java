@@ -33,13 +33,6 @@ public class OS {
     public static String library = System.getProperty("java.library.path");
     public static String classpath = System.getProperty("java.class.path");
 
-    public static String project = getProjectName(OS.class.getPackage(), 0);
-    public static String cache = FilenameUtils.concat(tmpdir, project + user);
-    public static String location = StringUtils.EMPTY;
-    public static final String DEFAULT_DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
-    public static final FastDateFormat DEFAULT_DATETIME_FORMAT
-            = FastDateFormat.getInstance(DEFAULT_DATETIME_PATTERN);
-
     public static boolean isWindows = name.contains("Windows");
     public static boolean isLinux = name.contains("Linux");
     public static boolean isMac = name.contains("Mac");
@@ -48,6 +41,22 @@ public class OS {
     public static boolean isARM = arch.startsWith("arm");
     public static boolean is64Bit = arch.equals("amd64") || arch.equals("x86_64");
     public static boolean isDesktop = false;
+
+    public static String project = getProjectName(OS.class.getPackage(), 0);
+    public static String cache = FilenameUtils.concat(tmpdir, project + user);
+    public static String location = StringUtils.EMPTY;
+
+    public static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
+    public static final FastDateFormat DEFAULT_DATE_FORMAT
+            = FastDateFormat.getInstance(DEFAULT_DATE_PATTERN);
+
+    public static final String DEFAULT_TIME_PATTERN = "HH:mm:ss.SSS";
+    public static final FastDateFormat DEFAULT_TIME_FORMAT
+            = FastDateFormat.getInstance(DEFAULT_TIME_PATTERN);
+
+    public static final String DEFAULT_DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
+    public static final FastDateFormat DEFAULT_DATETIME_FORMAT
+            = FastDateFormat.getInstance(DEFAULT_DATETIME_PATTERN);
 
     static {
         if (abi == null) abi = "";
@@ -215,7 +224,7 @@ public class OS {
             file = File.createTempFile(sourceCrc, null);//用于判断文件能否被创建
             if (file.delete() && loadFile(sourcePath, sourceCrc, file) == null) return;
         } catch (Throwable ignored) {
-            Log.getLogger().debug(ignored.getMessage());
+            Log.getLogger().debug("", ignored);
         }
 
         // User home.
