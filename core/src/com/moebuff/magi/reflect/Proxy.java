@@ -1,16 +1,17 @@
 package com.moebuff.magi.reflect;
 
 /**
- * 所有被代理的类用于创建代理对象的接口
+ * 用于创建代理对象的规范化接口
  *
+ * @param <T> 被代理的类
  * @author muto
  */
-public interface Proxy {
+public interface Proxy<T> {
     /**
      * 创建动态代理
      *
      * @param obj 被代理的对象
      * @return 代理后的对象
      */
-    <T> T getInstance(T obj);
+    T getInstance(T obj);
 }

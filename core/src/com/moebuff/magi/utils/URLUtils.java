@@ -15,6 +15,14 @@ import java.util.jar.JarFile;
  * @author muto
  */
 public class URLUtils {
+
+    /**
+     * 为 Lambda 而生，它允许你通过表达式来代替功能接口。
+     */
+    public interface URLGetter {
+        String getURL();//获取URL字符串
+    }
+
     private static final URLCodec codec = new URLCodec();
 
     /**
@@ -29,6 +37,14 @@ public class URLUtils {
         } catch (DecoderException e) {
             throw new UnhandledException(e);
         }
+    }
+
+    /**
+     * 原则上和 {@link #decode(String)} 没有区别，主要针对 Lambda 表达式，
+     * 通过 {@code 方法引用::} 简化调用嵌套，从而增强代码的可读性。
+     */
+    public static String decode(URLGetter getter) {
+        return decode(getter.getURL());
     }
 
     /**
@@ -70,6 +86,7 @@ public class URLUtils {
      */
     public static <T extends URLConnection> T openConnection(URL url) {
         try {
+            //noinspection unchecked
             return (T) url.openConnection();
         } catch (IOException e) {
             throw new UnhandledException(e);
@@ -87,4 +104,5 @@ public class URLUtils {
             throw new UnhandledException(e);
         }
     }
+
 }

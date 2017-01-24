@@ -5,6 +5,7 @@ import com.moebuff.magi.utils.UnhandledException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -70,7 +71,7 @@ public class ClassKit {
             String protocol = url.getProtocol();
 
             if ("file".equals(protocol)) {
-                classes = getClasses(url.getPath(), pkg, deep);
+                classes = getClasses(URLUtils.decode(url::getPath), pkg, deep);
             } else if ("jar".equals(protocol)) {
                 classes = getClasses(URLUtils.getJarFile(url), pkg, deep);
             }
@@ -91,12 +92,11 @@ public class ClassKit {
         });
 
         if (list != null) {
-            String name;
             Class clazz;
             for (File f : list) {
-                name = f.getName();
-                if (!name.endsWith(".class") || name.contains("$")) {
-                    continue;//排除非法的类文件
+                String name = f.getName();
+                if (!isValid(name)) {
+                    continue;//无效的类文件
                 }
 
                 name = FilenameUtils.getBaseName(name);
@@ -115,12 +115,11 @@ public class ClassKit {
             JarEntry entry = enumeration.nextElement();
             if (entry.isDirectory()) continue;
 
-            String name = entry.getName();
+            String name = entry.getName();//包含路径
             String path = FilenameUtils.getPathNoEndSeparator(name).replace("/", ".");
             name = FilenameUtils.getName(name);
-            if (!name.endsWith(".class") || name.contains("$")
-                    || !path.startsWith(pkg)) {
-                continue;
+            if (!isValid(name) || !path.startsWith(pkg)) {
+                continue;//不在指定的包内
             }
             if (deep || path.replace(pkg, "").isEmpty()) {
                 name = FilenameUtils.getBaseName(name);
@@ -130,5 +129,10 @@ public class ClassKit {
             }
         }
         return classes;
+    }
+
+    private static boolean isValid(String name) {
+        // 主类名$内部类名.class（如果匿名内部类，这内部类名为数字）
+        return StringUtils.isNotEmpty(name) && name.endsWith(".class") && !name.contains("$");
     }
 }

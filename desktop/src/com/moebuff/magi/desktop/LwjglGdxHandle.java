@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
  *
  * @author muto
  */
-public class LwjglGdxHandle extends FileHandle implements MethodInterceptor, Proxy, Catalog {
+public class LwjglGdxHandle extends FileHandle implements MethodInterceptor, Proxy<FileHandle>, Catalog {
     private File resource;
     private FileHandle su;
 
@@ -124,16 +124,14 @@ public class LwjglGdxHandle extends FileHandle implements MethodInterceptor, Pro
     }
 
     @Override
-    public final <T> T getInstance(T obj) {
-        FileHandle handle = (FileHandle) obj;
+    public final FileHandle getInstance(FileHandle obj) {
         Enhancer en = new Enhancer();
         en.setSuperclass(LwjglGdxHandle.class);
-        en.setCallback(new LwjglGdxHandle(handle));
-        //noinspection unchecked
-        return (T) en.create(new Class[]{
+        en.setCallback(new LwjglGdxHandle(obj));
+        return (FileHandle) en.create(new Class[]{
                 String.class, FileType.class, FileHandle.class
         }, new Object[]{
-                handle.path(), handle.type(), handle
+                obj.path(), obj.type(), obj
         });
     }
 
