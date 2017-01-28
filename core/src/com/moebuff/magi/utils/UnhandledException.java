@@ -1,7 +1,5 @@
 package com.moebuff.magi.utils;
 
-import org.slf4j.helpers.FormattingTuple;
-
 /**
  * 包装那些 已/未处理 的异常，并将它们扔出去。这些异常应在开发过程中被解决，或在运行时无效，后者通常用来记录日志。
  * 对于那些工具类来说，大多数的异常是方便开发者 {@code debug} 而使用的，建议将其包装，并在程序中杜绝。
@@ -41,11 +39,7 @@ public class UnhandledException extends RuntimeException {
      * @return 新创建的异常对象
      */
     public static RuntimeException format(String message, Object... values) {
-        FormattingTuple tuple = Log.formatMessage(message, values);
-        if (tuple.getThrowable() != null) {
-            return new UnhandledException(tuple.getMessage(), tuple.getThrowable());
-        }
-        return new UnhandledException(tuple.getMessage());
+        return ExceptionKit.format(UnhandledException.class, message, values);
     }
 
     /**
@@ -57,6 +51,6 @@ public class UnhandledException extends RuntimeException {
      *                   通常将最后一个设置为 {@link Throwable cause}，如果有的话。
      */
     public static void validate(boolean expression, String message, Object... values) {
-        if (!expression) throw format(message, values);
+        ExceptionKit.validate(UnhandledException.class, expression, message, values);
     }
 }
