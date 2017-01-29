@@ -88,7 +88,6 @@ project(":core") {
         compile "commons-codec:commons-codec:1.10"
         compile "org.apache.commons:commons-lang3:3.4"
         compile "commons-io:commons-io:2.5"
-        compile "commons-beanutils:commons-beanutils:1.9.3"
         compile "com.badlogicgames.gdx:gdx-jnigen:1.9.4"
         compile "com.badlogicgames.jlayer:jlayer:1.0.1-gdx"
         compile 'com.squareup.retrofit2:retrofit:2.1.0'
