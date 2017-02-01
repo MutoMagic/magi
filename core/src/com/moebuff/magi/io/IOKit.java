@@ -3,12 +3,9 @@ package com.moebuff.magi.io;
 import com.moebuff.magi.utils.Log;
 import com.moebuff.magi.utils.UnhandledException;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.CharEncoding;
 
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
+import java.io.*;
 
 /**
  * General IO stream manipulation utilities.
@@ -50,10 +47,10 @@ public class IOKit {
 
     /**
      * Writes chars from a <code>String</code> to bytes on an
-     * <code>OutputStream</code> using the default character encoding of the
-     * platform.
+     * <code>OutputStream</code> using the {@code UTF_8} character encoding
+     * of the platform.
      * <p>
-     * This method uses {@link String#getBytes()}.
+     * This method uses {@link String#getBytes(String)}.
      *
      * @param data   the <code>String</code> to write, null ignored
      * @param output the <code>OutputStream</code> to write to
@@ -62,7 +59,7 @@ public class IOKit {
      */
     public static void write(final String data, final OutputStream output) {
         try {
-            IOUtils.write(data, output, Charset.defaultCharset());
+            IOUtils.write(data, output, CharEncoding.UTF_8);
         } catch (IOException e) {
             throw new UnhandledException(e);
         }
@@ -81,10 +78,30 @@ public class IOKit {
         int size = data.length() + IOUtils.LINE_SEPARATOR.length();
         ByteArrayOutputStream byteArray = new ByteArrayOutputStream(size);
         try {
-            byteArray.write(data.getBytes());
-            byteArray.write(IOUtils.LINE_SEPARATOR.getBytes());
+            byteArray.write(data.getBytes(CharEncoding.UTF_8));
+            byteArray.write(IOUtils.LINE_SEPARATOR.getBytes(CharEncoding.UTF_8));
             byteArray.writeTo(output);
             output.flush();
+        } catch (IOException e) {
+            throw new UnhandledException(e);
+        }
+    }
+
+    /**
+     * Gets the contents of an <code>InputStream</code> as a String
+     * using the {@code UTF_8} character encoding of the platform.
+     * <p>
+     * This method buffers the input internally, so there is no need to use a
+     * <code>BufferedInputStream</code>.
+     *
+     * @param input the <code>InputStream</code> to read from
+     * @return the requested String
+     * @throws NullPointerException if the input is null
+     * @throws UnhandledException   if an I/O error occurs
+     */
+    public static String toString(final InputStream input) {
+        try {
+            return IOUtils.toString(input, CharEncoding.UTF_8);
         } catch (IOException e) {
             throw new UnhandledException(e);
         }
