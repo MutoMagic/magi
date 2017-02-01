@@ -105,4 +105,19 @@ public class URLUtils {
         }
     }
 
+    /**
+     * 根据 String 表示形式创建 URL 对象
+     *
+     * @param spec 将作为 URL 解析的 String
+     * @return 新创建的 URL 对象
+     * @throws UnhandledException 如果字符串指定未知协议
+     */
+    public static URL create(String spec) {
+        try {
+            return new URL(spec);
+        } catch (MalformedURLException e) {
+            throw new UnhandledException(e);
+        }
+    }
+
 }
