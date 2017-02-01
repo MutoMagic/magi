@@ -51,6 +51,6 @@ public class UnhandledException extends RuntimeException {
      *                   通常将最后一个设置为 {@link Throwable cause}，如果有的话。
      */
     public static void validate(boolean expression, String message, Object... values) {
-        ExceptionKit.validate(UnhandledException.class, expression, message, values);
+        if (!expression) throw format(message, values);
     }
 }

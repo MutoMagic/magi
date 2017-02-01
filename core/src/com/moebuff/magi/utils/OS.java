@@ -152,7 +152,7 @@ public class OS {
         new OS(null).load(libraryName);
     }
 
-    // Source from libGDX.
+    // Source from libGDX. See SharedLibraryLoader.
     //---------------------------------------------------------------------------------------------
 
     private static final HashSet<String> loadedLibraries = new HashSet<>();
