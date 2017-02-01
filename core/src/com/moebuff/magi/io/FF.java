@@ -52,8 +52,8 @@ public class FF {
     //---------------------------------------------------------------------------------------------
 
     public static final FileHandle ASSETS;
+    public static final FileHandle OSZ_300034 = ASSETS.child("300034 YooSanHyakurei - Ketsubetsu no Tabi.osz");
     public static final FileHandle OSZ_404910 = ASSETS.child("404910 sana - Packet Hero.osz");
-    public static final FileHandle OSZ_420265 = ASSETS.child("420265 senya - Ondosa.osz");
 
     public static final FileHandle NC = ASSETS.child("nightcore");
     public static final FileHandle DRUM = NC.child("drum.wav");

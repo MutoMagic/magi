@@ -1,6 +1,5 @@
 package com.moebuff.magi.utils;
 
-import com.badlogic.gdx.utils.SharedLibraryLoader;
 import com.moebuff.magi.io.FCIV;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +20,6 @@ import java.util.zip.ZipFile;
  * 系统工具
  *
  * @author muto
- * @see SharedLibraryLoader
  */
 public class OS {
     public static String name = System.getProperty("os.name");
@@ -154,6 +152,7 @@ public class OS {
         new OS(null).load(libraryName);
     }
 
+    // Source from libGDX.
     //---------------------------------------------------------------------------------------------
 
     private static final HashSet<String> loadedLibraries = new HashSet<>();
