@@ -27,8 +27,8 @@ public class IOKit {
             if (closeable != null) {
                 closeable.close();
             }
-        } catch (final IOException ioe) {
-            Log.getLogger().debug("", ioe);
+        } catch (final IOException ignored) {
+            Log.getLogger().debug("", ignored);
         }
     }
 
