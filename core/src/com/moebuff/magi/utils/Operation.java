@@ -7,7 +7,7 @@ import org.apache.commons.lang3.Validate;
 import java.util.Random;
 
 /**
- * 一些常用的数学运算
+ * 一些常用的运算操作
  *
  * @author muto
  */
