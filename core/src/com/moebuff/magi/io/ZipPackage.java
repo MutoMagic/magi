@@ -96,7 +96,7 @@ public class ZipPackage extends File {
     }
 
     public ZipPackage(File f) {
-        this(FileKit.getCanonicalPath(f));
+        this(FileKit.getPath(f));
     }
 
     public void unpack(File dest) {

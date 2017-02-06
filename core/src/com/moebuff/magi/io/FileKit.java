@@ -123,7 +123,7 @@ public class FileKit {
      *
      * @see FilenameUtils#concat(String, String)
      */
-    public static String getCanonicalPath(File f) {
+    public static String getPath(File f) {
         return FilenameUtils.concat(f.getPath(), "");
     }
 

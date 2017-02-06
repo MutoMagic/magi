@@ -134,7 +134,7 @@ public class ZipItem extends File {
 
     @Override
     public ZipItem getCanonicalFile() {
-        return new ZipItem(FileKit.getCanonicalPath(this), pkg);
+        return new ZipItem(FileKit.getPath(this), pkg);
     }
 
     /**
