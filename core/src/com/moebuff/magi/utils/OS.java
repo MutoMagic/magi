@@ -31,6 +31,10 @@ public class OS {
     public static String library = System.getProperty("java.library.path");
     public static String classpath = System.getProperty("java.class.path");
 
+    public static String project = getProjectName(OS.class.getPackage(), 0);
+    public static String cache = FilenameUtils.concat(tmpdir, project + user);
+    public static String location = StringUtils.EMPTY;
+
     public static boolean isWindows = name.contains("Windows");
     public static boolean isLinux = name.contains("Linux");
     public static boolean isMac = name.contains("Mac");
@@ -39,10 +43,7 @@ public class OS {
     public static boolean isARM = arch.startsWith("arm");
     public static boolean is64Bit = arch.equals("amd64") || arch.equals("x86_64");
     public static boolean isDesktop = false;
-
-    public static String project = getProjectName(OS.class.getPackage(), 0);
-    public static String cache = FilenameUtils.concat(tmpdir, project + user);
-    public static String location = StringUtils.EMPTY;
+    public static boolean isJar = false;
 
     public static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
     public static final FastDateFormat DEFAULT_DATE_FORMAT
@@ -74,6 +75,7 @@ public class OS {
         if (isDesktop) {
             URL local = OS.class.getProtectionDomain().getCodeSource().getLocation();
             location = URLUtils.decode(local.getPath());
+            isJar = location.endsWith(".jar");
         }
     }
 
