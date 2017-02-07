@@ -31,7 +31,7 @@ public class FileKit {
      */
     public static File getResource(String path) {
         if (OS.isJar) {
-            return new ZipPackage(OS.classpath).child(path);
+            return new ZipPackage(OS.location).child(path);
         }
         return new File(WKINGDIR, path);
     }

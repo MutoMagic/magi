@@ -29,11 +29,10 @@ public class OS {
     public static String user = System.getProperty("user.name");
     public static String home = System.getProperty("user.home");
     public static String library = System.getProperty("java.library.path");
-    public static String classpath = System.getProperty("java.class.path");
 
     public static String project = getProjectName(OS.class.getPackage(), 0);
     public static String cache = FilenameUtils.concat(tmpdir, project + user);
-    public static String location = StringUtils.EMPTY;
+    public static String location = StringUtils.EMPTY;//拒绝CLASSPATH，获取当前运行的jar
 
     public static boolean isWindows = name.contains("Windows");
     public static boolean isLinux = name.contains("Linux");
